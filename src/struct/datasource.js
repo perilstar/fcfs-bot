@@ -131,9 +131,7 @@ class DataSource extends EventEmitter {
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
     bot_prefix = excluded.bot_prefix`;
-
-    console.log(values);
-
+    
     await db.run(sql, values);
   }
 
@@ -200,21 +198,6 @@ class DataSource extends EventEmitter {
 
     await db.run(sql, values);
   }
-
-  // timeoutSaveMonitor(snowflake) {
-  //   if (this.saveTimers[snowflake]) return;
-  //   this.saveTimers[snowflake] = setTimeout(() => this.saveMonitor(snowflake), 3000);
-  // }
-
-  // timeoutSave(guildID) {
-  //   if (this.saveTimer) return;
-  //   this.saveTimer = setTimeout(() => this.save(guildID), 10000);
-  // }
-
-  // async save(guildID) {
-  //   this.saveTimer = null;
-  //   // Implement saving code here
-  // }
 
 }
 
