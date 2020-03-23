@@ -8,7 +8,9 @@ class DataSource extends EventEmitter {
 
     this.client = client;
     this.servers = {};
-    this.saveTimers = {};
+
+    this.saveServerSnowflakes = [];
+    this.saveMonitorSnowflakes = [];
   }
 
   addServer(id, prefix = 'fcfs!') {
@@ -47,6 +49,7 @@ class DataSource extends EventEmitter {
   }
 
   async load() {
+
     let db = await sqlite.open('./db/fcfs.db');
 
     let sql = `SELECT * FROM server`
@@ -83,56 +86,78 @@ class DataSource extends EventEmitter {
     await sqlite.close(db)
   }
 
-  async saveServer(snowflake) {
-    let server = this.servers[snowflake];
+  timeoutSave() {
+    if (this.saveTimer) return;
+    this.saveTimer = setTimeout(() => this.save(), 3000);
+  }
 
+  async save() {
     let db = await sqlite.open('./db/fcfs.db');
-
-    let sql = `INSERT INTO server (id, bot_prefix)
-    VALUES (?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-    id = ?,
-    bot_prefix = ?`;
-
-    let values = [
-      server.id,
-      server.prefix,
-    ];
-
-    values = values.concat(values);
-
-    await db.run(sql, values);
-
+    await this.saveServers(db);
+    await this.saveMonitors(db);
     await sqlite.close(db);
   }
 
-  async saveMonitor(snowflake) {
-    delete this.saveTimers[snowflake];
+  saveServer(snowflake) {
+    this.saveServerSnowflakes.push(snowflake);
 
-    let guild = this.client.channels.resolve(snowflake).guild
-    if (guild.available) {
+    this.timeoutSave();
+  }
+
+  async saveServers(db) {
+    if (!this.saveServerSnowflakes.length) return;
+
+    this.saveServersTimer = null;
+
+    let placeholders = [];
+    let values = [];
+
+    for (let snowflake of this.saveServerSnowflakes) {
+      let server = this.servers[snowflake];
+      
+      let v = [
+        server.id,
+        server.prefix
+      ];
+    
+      placeholders.push('(?, ?)');
+      values = values.concat(v);
+    }
+
+    this.saveServerSnowflakes = [];
+
+    let sql = `INSERT INTO server (id, bot_prefix)
+    VALUES ${placeholders.join(', ')}
+    ON CONFLICT(id) DO UPDATE SET
+    id = excluded.id,
+    bot_prefix = excluded.bot_prefix`;
+    
+    await db.run(sql, values);
+  }
+
+  saveMonitor(snowflake) {
+    this.saveMonitorSnowflakes.push(snowflake);
+
+    this.timeoutSave();
+  }
+
+  async saveMonitors(db) {
+    if (!this.saveMonitorSnowflakes.length) return;
+
+    this.saveMonitorsTimer = null;
+
+    let placeholders = [];
+    let values = [];
+
+    for (let snowflake of this.saveMonitorSnowflakes) {
+      let guild = this.client.channels.resolve(snowflake).guild
+      if (!guild.available) return;
+      
       let guildID = guild.id;
+  
       let monitor = this.servers[guildID].monitoredChannels[snowflake];
 
-      let db = await sqlite.open('./db/fcfs.db');
-
-      let sql = `INSERT INTO monitor (id, guild_id, name, display_channel, display_message,
-        first_n, rejoin_window, afk_check_duration, restricted_mode, allowed_roles, queue)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(id) DO UPDATE SET
-      id = ?,
-      guild_id = ?,
-      name = ?,
-      display_channel = ?,
-      display_message = ?,
-      first_n = ?,
-      rejoin_window = ?,
-      afk_check_duration = ?,
-      restricted_mode = ?,
-      allowed_roles = ?,
-      queue = ?`;
-
-      let values = [
+      let v = [
         monitor.id,
         monitor.guildID,
         monitor.name,
@@ -146,28 +171,33 @@ class DataSource extends EventEmitter {
         monitor.queue.map(member => member.id).join(',')
       ];
 
-      values = values.concat(values);
-
-      await db.run(sql, values);
-
-      await sqlite.close(db);
+      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+      values = values.concat(v);
     }
+
+    this.saveMonitorSnowflakes = [];
+
+
+    let sql = `INSERT INTO monitor (id, guild_id, name, display_channel, display_message,
+      first_n, rejoin_window, afk_check_duration, restricted_mode, allowed_roles, queue)
+    VALUES ${placeholders.join(', ')}
+    ON CONFLICT(id) DO UPDATE SET
+    id = excluded.id,
+    guild_id = excluded.guild_id,
+    name = excluded.name,
+    display_channel = excluded.display_channel,
+    display_message = excluded.display_message,
+    first_n = excluded.first_n,
+    rejoin_window = excluded.rejoin_window,
+    afk_check_duration = excluded.afk_check_duration,
+    restricted_mode = excluded.restricted_mode,
+    allowed_roles = excluded.allowed_roles,
+    queue = excluded.queue`;
+
+    console.log(sql);
+
+    await db.run(sql, values);
   }
-
-  timeoutSaveMonitor(snowflake) {
-    if (this.saveTimers[snowflake]) return;
-    this.saveTimers[snowflake] = setTimeout(() => this.saveMonitor(snowflake), 3000);
-  }
-
-  // timeoutSave(guildID) {
-  //   if (this.saveTimer) return;
-  //   this.saveTimer = setTimeout(() => this.save(guildID), 10000);
-  // }
-
-  // async save(guildID) {
-  //   this.saveTimer = null;
-  //   // Implement saving code here
-  // }
 
 }
 

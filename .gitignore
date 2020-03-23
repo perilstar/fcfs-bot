@@ -61,4 +61,4 @@ typings/
 .next
 
 # Data storage directory
-.db/
+db/

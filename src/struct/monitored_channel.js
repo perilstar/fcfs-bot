@@ -50,7 +50,7 @@ class MonitoredChannel {
       }
     }
 
-    this.client.datasource.timeoutSaveMonitor(this.id);
+    this.client.datasource.saveMonitor(this.id);
   }
 
   get message() {
@@ -67,7 +67,7 @@ class MonitoredChannel {
     } else {
       this.queue.push(this.client.users.resolve(user));
       this.timeoutUpdateDisplay();
-      this.client.datasource.timeoutSaveMonitor(this.id);
+      this.client.datasource.saveMonitor(this.id);
     }
   }
 
@@ -79,7 +79,7 @@ class MonitoredChannel {
     let removeIndex = this.queue.findIndex(el => el.id == user.id)
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
-    this.client.datasource.timeoutSaveMonitor(this.id);
+    this.client.datasource.saveMonitor(this.id);
   }
 
   timeoutUpdateDisplay() {

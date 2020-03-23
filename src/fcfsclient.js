@@ -6,7 +6,7 @@ const TOKEN = process.env.FCFS_BOT_TOKEN;
 class FCFSClient extends AkairoClient {
   constructor() {
     super({
-      ownerID: '148611805445357569',
+      ownerID: ['148611805445357569', '346826796483870741']
     }, {
       disableEveryone: true
     });
