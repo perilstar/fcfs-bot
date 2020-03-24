@@ -89,9 +89,13 @@ class MonitoredChannel {
 
   updateDisplay() {
     this.updateTimer = null;
-    this.client.channels.resolve(this.displayChannel).messages.fetch(this.displayMessage).then(message => {
-      message.edit(this.message);
-    });
+    try {
+      this.client.channels.resolve(this.displayChannel).messages.fetch(this.displayMessage).then(message => {
+        message.edit(this.message);
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 

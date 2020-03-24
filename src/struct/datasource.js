@@ -8,15 +8,12 @@ class DataSource extends EventEmitter {
 
     this.client = client;
     this.servers = {};
-
+    
     this.removeMonitorSnowflakes = [];
+    this.removeServerSnowflakes = [];
 
     this.saveServerSnowflakes = [];
     this.saveMonitorSnowflakes = [];
-  }
-
-  addServer(id, prefix = 'fcfs!') {
-    this.servers[id] = new Server(this.client, id, prefix)
   }
 
   async revUpThoseFryers() {
@@ -90,12 +87,13 @@ class DataSource extends EventEmitter {
 
   timeoutSave() {
     if (this.saveTimer) return;
-    this.saveTimer = setTimeout(() => this.save(), 3000);
+    this.saveTimer = setTimeout(() => this.save(), 1500);
   }
 
   async save() {
     let db = await sqlite.open('./db/fcfs.db');
     await this.removeMonitors(db);
+    await this.removeServers(db);
     await this.saveServers(db);
     await this.saveMonitors(db);
     await sqlite.close(db);
@@ -135,6 +133,33 @@ class DataSource extends EventEmitter {
     bot_prefix = excluded.bot_prefix`;
     
     await db.run(sql, values);
+  }
+
+  addServer(snowflake, prefix = 'fcfs!') {
+    this.servers[snowflake] = new Server(this.client, snowflake, prefix)
+  }
+
+  removeServer(snowflake) {
+    this.removeServerSnowflakes.push(snowflake);
+
+    this.timeoutSave();
+  }
+
+  async removeServers(db) {
+    if (!this.removeServerSnowflakes.length) return;
+
+    let placeholders = this.removeServerSnowflakes.map(el => '?');
+
+    let sql = `DELETE FROM server
+    WHERE id IN (${placeholders.join(', ')});
+    DELETE FROM monitor
+    WHERE guild_id IN (${placeholders.join(', ')})`;
+
+    await db.run(sql, this.removeServerSnowflakes.concat(this.removeServerSnowflakes));
+
+    this.removeServerSnowflakes.forEach(snowflake => delete this.servers[snowflake]);
+
+    this.removeServerSnowflakes = [];
   }
 
   removeMonitor(snowflake) {

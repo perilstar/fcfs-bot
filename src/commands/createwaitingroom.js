@@ -78,7 +78,13 @@ class CreateWaitingRoomCommand extends Command {
       return message.channel.send(`Error: \`${args.displayChannel}\` is not a text channel!`);
     }
 
-    let displayMessage = await message.guild.channels.resolve(args.displayChannel).send('<Pending Update>');
+    let displayMessage = '';
+
+    try {
+      displayMessage = await message.guild.channels.resolve(args.displayChannel).send('<Pending Update>');
+    } catch (err) {
+      return message.channel.send('Something went wrong. Does the bot have permissions to send messages in `displayChannel`?')
+    }
 
     let data = {
       guildID: message.guild.id,
