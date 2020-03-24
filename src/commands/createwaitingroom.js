@@ -1,11 +1,11 @@
 const { Command } = require('discord-akairo');
 
-class CreateChannelGroupCommand extends Command {
+class CreateWaitingRoomCommand extends Command {
   constructor() {
     super('createwaitingroom', {
       aliases: ['createwaitingroom', 'cwr'],
       split: 'quoted',
-      channelRestriction: 'guild',
+      channel: 'guild',
       userPermissions: ['ADMINISTRATOR'],
       args: [
         {
@@ -96,7 +96,7 @@ class CreateChannelGroupCommand extends Command {
 
     let monitoredChannel = server.addMonitoredChannel(data);
     
-    this.client.datasource.saveMonitor(args.monitorChannel);
+    this.client.datasource.saveMonitor(args.monitorChannel)
 
     await monitoredChannel.updateDisplay();
 
@@ -104,4 +104,4 @@ class CreateChannelGroupCommand extends Command {
   }
 }
 
-module.exports = CreateChannelGroupCommand;
+module.exports = CreateWaitingRoomCommand;

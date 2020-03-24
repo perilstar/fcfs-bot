@@ -13,8 +13,8 @@ class Server {
     return this.monitoredChannels[data.id] = new MonitoredChannel(this.client, data);
   }
 
-  removeMonitoredChannel(name) {
-    delete this.monitoredChannels[name];
+  removeMonitoredChannel(id) {
+    delete this.monitoredChannels[id];
   }
 }
 

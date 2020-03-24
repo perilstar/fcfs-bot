@@ -9,6 +9,8 @@ class DataSource extends EventEmitter {
     this.client = client;
     this.servers = {};
 
+    this.removeMonitorSnowflakes = [];
+
     this.saveServerSnowflakes = [];
     this.saveMonitorSnowflakes = [];
   }
@@ -93,9 +95,11 @@ class DataSource extends EventEmitter {
 
   async save() {
     let db = await sqlite.open('./db/fcfs.db');
+    await this.removeMonitors(db);
     await this.saveServers(db);
     await this.saveMonitors(db);
     await sqlite.close(db);
+    this.saveTimer = null;
   }
 
   saveServer(snowflake) {
@@ -106,8 +110,6 @@ class DataSource extends EventEmitter {
 
   async saveServers(db) {
     if (!this.saveServerSnowflakes.length) return;
-
-    this.saveServersTimer = null;
 
     let placeholders = [];
     let values = [];
@@ -135,6 +137,25 @@ class DataSource extends EventEmitter {
     await db.run(sql, values);
   }
 
+  removeMonitor(snowflake) {
+    this.removeMonitorSnowflakes.push(snowflake);
+
+    this.timeoutSave();
+  }
+
+  async removeMonitors(db) {
+    if (!this.removeMonitorSnowflakes.length) return;
+
+    let placeholders = this.removeMonitorSnowflakes.map(el => '?');
+
+    let sql = `DELETE FROM monitor
+    WHERE id IN (${placeholders.join(', ')})`;
+
+    await db.run(sql, this.removeMonitorSnowflakes);
+
+    this.removeMonitorSnowflakes = [];
+  }
+
   saveMonitor(snowflake) {
     this.saveMonitorSnowflakes.push(snowflake);
 
@@ -143,8 +164,6 @@ class DataSource extends EventEmitter {
 
   async saveMonitors(db) {
     if (!this.saveMonitorSnowflakes.length) return;
-
-    this.saveMonitorsTimer = null;
 
     let placeholders = [];
     let values = [];
@@ -193,8 +212,6 @@ class DataSource extends EventEmitter {
     restricted_mode = excluded.restricted_mode,
     allowed_roles = excluded.allowed_roles,
     queue = excluded.queue`;
-
-    console.log(sql);
 
     await db.run(sql, values);
   }
