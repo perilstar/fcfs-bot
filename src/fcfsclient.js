@@ -20,7 +20,7 @@ class FCFSClient extends AkairoClient {
         if (message.channel instanceof TextChannel) {
           return ['fcfs!', this.datasource.servers[message.guild.id].prefix];
         } else {
-          return '';
+          return ['fcfs!', ''];
         }
       },
       allowMention: true
