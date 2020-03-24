@@ -96,18 +96,17 @@ class DataSource extends EventEmitter {
     await this.saveServers(db);
     await this.saveMonitors(db);
     await sqlite.close(db);
+    this.saveTimer = null;
   }
 
   saveServer(snowflake) {
     this.saveServerSnowflakes.push(snowflake);
-
+    
     this.timeoutSave();
   }
 
   async saveServers(db) {
     if (!this.saveServerSnowflakes.length) return;
-
-    this.saveServersTimer = null;
 
     let placeholders = [];
     let values = [];
@@ -143,8 +142,6 @@ class DataSource extends EventEmitter {
 
   async saveMonitors(db) {
     if (!this.saveMonitorSnowflakes.length) return;
-
-    this.saveMonitorsTimer = null;
 
     let placeholders = [];
     let values = [];
@@ -193,8 +190,6 @@ class DataSource extends EventEmitter {
     restricted_mode = excluded.restricted_mode,
     allowed_roles = excluded.allowed_roles,
     queue = excluded.queue`;
-
-    console.log(sql);
 
     await db.run(sql, values);
   }
