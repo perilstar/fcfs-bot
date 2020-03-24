@@ -5,7 +5,7 @@ class DeleteWaitingRoomCommand extends Command {
     super('deletewaitingroom', {
       aliases: ['deletewaitingroom', 'dwr'],
       split: 'quoted',
-      channelRestriction: 'guild',
+      channel: 'guild',
       userPermissions: ['ADMINISTRATOR'],
       args: [
         {

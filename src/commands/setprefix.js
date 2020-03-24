@@ -5,7 +5,7 @@ class SetPrefixCommand extends Command {
     super('setprefix', {
       aliases: ['setprefix'],
       split: 'quoted',
-      channelRestriction: 'guild',
+      channel: 'guild',
       userPermissions: ['ADMINISTRATOR'],
       args: [
         {

@@ -5,7 +5,7 @@ class ListWaitingRoomsCommand extends Command {
     super('listwaitingrooms', {
       aliases: ['listwaitingrooms', 'lwr'],
       split: 'quoted',
-      channelRestriction: 'guild',
+      channel: 'guild',
       userPermissions: ['ADMINISTRATOR']
     });
   }

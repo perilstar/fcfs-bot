@@ -5,7 +5,7 @@ class CreateWaitingRoomCommand extends Command {
     super('createwaitingroom', {
       aliases: ['createwaitingroom', 'cwr'],
       split: 'quoted',
-      channelRestriction: 'guild',
+      channel: 'guild',
       userPermissions: ['ADMINISTRATOR'],
       args: [
         {
