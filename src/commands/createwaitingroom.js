@@ -96,7 +96,7 @@ class CreateWaitingRoomCommand extends Command {
 
     let monitoredChannel = server.addMonitoredChannel(data);
     
-    this.client.datasource.saveMonitor(args.mon)
+    this.client.datasource.saveMonitor(args.monitorChannel)
 
     await monitoredChannel.updateDisplay();
 
