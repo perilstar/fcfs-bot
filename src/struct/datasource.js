@@ -9,6 +9,8 @@ class DataSource extends EventEmitter {
     this.client = client;
     this.servers = {};
 
+    this.removeMonitorSnowflakes = [];
+
     this.saveServerSnowflakes = [];
     this.saveMonitorSnowflakes = [];
   }
@@ -93,6 +95,7 @@ class DataSource extends EventEmitter {
 
   async save() {
     let db = await sqlite.open('./db/fcfs.db');
+    await this.removeMonitors(db);
     await this.saveServers(db);
     await this.saveMonitors(db);
     await sqlite.close(db);
@@ -101,7 +104,7 @@ class DataSource extends EventEmitter {
 
   saveServer(snowflake) {
     this.saveServerSnowflakes.push(snowflake);
-    
+
     this.timeoutSave();
   }
 
@@ -132,6 +135,25 @@ class DataSource extends EventEmitter {
     bot_prefix = excluded.bot_prefix`;
     
     await db.run(sql, values);
+  }
+
+  removeMonitor(snowflake) {
+    this.removeMonitorSnowflakes.push(snowflake);
+
+    this.timeoutSave();
+  }
+
+  async removeMonitors(db) {
+    if (!this.removeMonitorSnowflakes.length) return;
+
+    let placeholders = this.removeMonitorSnowflakes.map(el => '?');
+
+    let sql = `DELETE FROM monitor
+    WHERE id IN (${placeholders.join(', ')})`;
+
+    await db.run(sql, this.removeMonitorSnowflakes);
+
+    this.removeMonitorSnowflakes = [];
   }
 
   saveMonitor(snowflake) {
