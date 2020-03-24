@@ -1,4 +1,5 @@
 const { AkairoClient, CommandHandler, ListenerHandler } = require('discord-akairo');
+const { TextChannel } = require('discord.js');
 const DataSource = require('./struct/datasource');
 
 const TOKEN = process.env.FCFS_BOT_TOKEN;
@@ -16,7 +17,11 @@ class FCFSClient extends AkairoClient {
     this.commandHandler = new CommandHandler(this, {
       directory: './src/commands/',
       prefix: message => {
-        return ['fcfs!', this.datasource.servers[message.guild.id].prefix];
+        if (message.channel instanceof TextChannel) {
+          return ['fcfs!', this.datasource.servers[message.guild.id].prefix];
+        } else {
+          return '';
+        }
       },
       allowMention: true
     });
