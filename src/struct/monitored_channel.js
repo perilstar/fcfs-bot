@@ -77,8 +77,8 @@ class MonitoredChannel {
     setTimeout(() => this.removeUserFromQueue(user), this.rejoinWindow)
   }
 
-  removeUserFromQueue(user) {
-    let removeIndex = this.queue.findIndex(el => el.id == user.id)
+  removeUserFromQueue(userID) {
+    let removeIndex = this.queue.findIndex(el => el.id == userID)
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
     this.client.datasource.saveMonitor(this.id);
