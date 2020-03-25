@@ -3,7 +3,7 @@ const { Command } = require('discord-akairo');
 class PingAfkCommand extends Command {
   constructor() {
     super('pingafk', {
-      aliases: ['pingafk', 'afk'],
+      aliases: ['pingafk', 'afk', 'afkcheck'],
       split: 'quoted',
       channel: 'guild',
       userPermissions: ['ADMINISTRATOR']
@@ -18,7 +18,7 @@ class PingAfkCommand extends Command {
       return message.channel.send(`Error: Missing argument: \`mentionUser\`. Use fcfs!help for commands.`);
     }
 
-    let mentionMessage = "Press thumbs up if you are not AFK";
+    let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
     mention.send(mentionMessage).then(msg => {
       msg.react('👍');
 
@@ -31,18 +31,16 @@ class PingAfkCommand extends Command {
             const reaction = collected.first();
 
             if (reaction.emoji.name === '👍') {
-              msg.reply('you are kept in the queue');
+              msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
             }
         })
         .catch(collected => {
           //TODO - remove user from VC queue in text queue
           
 
-          msg.reply('you didn\'t reacted with thumbs up, it means you are afk so you are removed from the queue.');
+          msg.reply('You failed to react to the message in time. You have been removed from the queue.');
         });
     });
-
-    
 
   }
 }
