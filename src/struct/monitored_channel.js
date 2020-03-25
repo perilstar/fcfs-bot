@@ -59,7 +59,7 @@ class MonitoredChannel {
     let title = `**${this.name} Queue:**`;
     let top = this.queue.slice(0, this.firstN).map(user => `${guild.members.cache.get(user.id).displayName} (${user.tag})`).join('\n');
 
-    return title + "\n```\n" + top + "\n```";
+    return title + '\n```\n' + (top || '<EMPTY>') + '\n```';
   }
 
   addUserToQueue(user) {
