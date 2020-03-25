@@ -9,7 +9,7 @@ async function saveAndExit() {
   console.log('Saving...');
   await client.datasource.save();
   console.log('Data Saved.');
-  process.exit()
+  process.exit(0)
 }
 
 process.on('SIGINT', saveAndExit);
