@@ -62,19 +62,19 @@ class MonitoredChannel {
     return title + '\n```\n' + (top || '<EMPTY>') + '\n```';
   }
 
-  addUserToQueue(user) {
-    if (this.removalTimers[user.id]) {
-      clearTimeout(this.removalTimers[user.id]);
-      delete this.removalTimers[user.id];
+  addUserToQueue(userID) {
+    if (this.removalTimers[userID]) {
+      clearTimeout(this.removalTimers[userID]);
+      delete this.removalTimers[userID];
     } else {
-      this.queue.push(this.client.users.resolve(user));
+      this.queue.push(this.client.users.resolve(userID));
       this.timeoutUpdateDisplay();
       this.client.datasource.saveMonitor(this.id);
     }
   }
 
-  timeoutRemoveUserFromQueue(user) {
-    setTimeout(() => this.removeUserFromQueue(user), this.rejoinWindow)
+  timeoutRemoveUserFromQueue(userID) {
+    this.removalTimers[userID] = setTimeout(() => this.removeUserFromQueue(userID), this.rejoinWindow);
   }
 
   removeUserFromQueue(userID) {

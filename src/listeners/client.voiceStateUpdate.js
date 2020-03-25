@@ -14,7 +14,7 @@ class VoiceStateUpdateListener extends Listener {
       if (guild.available) {
         let server = this.client.datasource.servers[guild.id];
         let monitoredChannel = server.monitoredChannels[oldState.channelID];
-        if (monitoredChannel)  monitoredChannel.timeoutRemoveUserFromQueue(oldState.id);
+        if (monitoredChannel) monitoredChannel.timeoutRemoveUserFromQueue(oldState.id);
       } else {
         console.error('A guild was not available!');
       }      

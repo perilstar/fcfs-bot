@@ -69,7 +69,7 @@ class DataSource extends EventEmitter {
         displayChannel: row.display_channel,
         displayMessage: row.display_message,
         firstN: row.first_n,
-        rejoinWindow: row.rejoinWindow,
+        rejoinWindow: row.rejoin_window,
         afkCheckDuration: row.afk_check_duration,
         restrictedMode: row.restricted_mode === 1,
         allowedRoles: row.allowed_roles.split(',').filter(Boolean),
