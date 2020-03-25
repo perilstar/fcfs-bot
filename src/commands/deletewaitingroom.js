@@ -27,7 +27,7 @@ class DeleteWaitingRoomCommand extends Command {
     let displayChannelSnowflake = server.monitoredChannels[args.monitorChannel].displayChannel;
     let displayMessageSnowflake = server.monitoredChannels[args.monitorChannel].displayMessage;
 
-    this.client.channels.resolve(displayChannelSnowflake).messages.delete(displayMessageSnowflake);
+    this.client.channels.resolve(displayChannelSnowflake).messages.delete(displayMessageSnowflake).catch(err => console.log(err));
 
     server.removeMonitoredChannel(args.monitorChannel);
     ds.removeMonitor(args.monitorChannel);

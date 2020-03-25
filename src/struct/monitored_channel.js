@@ -43,10 +43,10 @@ class MonitoredChannel {
     // If there's users missing from the queue, add them in a random order
     if (this.queue.length < this.channel.members.size) {
       let currentlyConnected = this.channel.members;
-      let rest = currentlyConnected.random(currentlyConnected.size).filter(id => !this.queue.includes(id));
+      let rest = currentlyConnected.random(currentlyConnected.size).filter(user => !this.queue.includes(user.id));
 
-      for (let user of rest) {
-        this.queue.push(user);
+      for (let guildMember of rest) {
+        this.queue.push(guildMember.user);
       }
     }
 
@@ -54,10 +54,12 @@ class MonitoredChannel {
   }
 
   get message() {
-    let title = `**${this.name} Queue:**`;
-    let top = this.queue.slice(0, this.firstN).map(user => `${user.username} (${user.tag})`).join('\n');
+    let guild = this.client.guilds.resolve(this.guildID);
 
-    return title + "\n```\n" + top + "\n```";
+    let title = `**${this.name} Queue:**`;
+    let top = this.queue.slice(0, this.firstN).map(user => `${guild.members.cache.get(user.id).displayName} (${user.tag})`).join('\n');
+
+    return title + '\n```\n' + (top || '<EMPTY>') + '\n```';
   }
 
   addUserToQueue(user) {
@@ -89,9 +91,13 @@ class MonitoredChannel {
 
   updateDisplay() {
     this.updateTimer = null;
-    this.client.channels.resolve(this.displayChannel).messages.fetch(this.displayMessage).then(message => {
-      message.edit(this.message);
-    });
+    try {
+      this.client.channels.resolve(this.displayChannel).messages.fetch(this.displayMessage).then(message => {
+        message.edit(this.message);
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
