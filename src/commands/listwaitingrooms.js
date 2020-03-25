@@ -44,10 +44,10 @@ class ListWaitingRoomsCommand extends Command {
     let lines = [];
 
     for (let i = 0; i < names.length; i++) {
-      lines.push(`[${snowflakes[i]}] "${names[i]}" monitors "${monitoredNames[i]}" and displays in "${displayNames[i]}"`)
+      lines.push(`[${snowflakes[i]}] '${names[i]}' monitors '${monitoredNames[i]}' and displays in '${displayNames[i]}'`)
     }
 
-    let text = "```\n" + lines.join('\n') + "\n```";
+    let text = '```\n' + lines.join('\n') + '\n```';
 
     message.channel.send(text);
   }
