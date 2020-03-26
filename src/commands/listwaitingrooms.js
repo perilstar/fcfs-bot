@@ -6,11 +6,19 @@ class ListWaitingRoomsCommand extends Command {
       aliases: ['listwaitingrooms', 'lwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR']
+      userPermissions: ['ADMINISTRATOR'],
+      args: [
+        {
+          id: 'page',
+          type: 'number'
+        }
+      ]
     });
   }
 
   async exec(message, args) {
+    let page = args.page || 1;
+
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
@@ -33,7 +41,17 @@ class ListWaitingRoomsCommand extends Command {
       lines.push(`'${monitoredNames[i]}' queue is displayed in '#${displayNames[i]}'`)
     }
 
-    let text = '```\n' + lines.join('\n') + '\n```';
+    let pages = Math.ceil(lines.length / 10);
+
+    let currentPage = [];
+
+    if (page > pages || page < 1) {
+      currentPage = ['<NONE>']
+    } else {
+      currentPage = lines.slice((page - 1) * 10, 10);
+    }
+
+    let text = '```\n' + currentPage.join('\n') + '\n```';
 
     message.channel.send(text);
   }
