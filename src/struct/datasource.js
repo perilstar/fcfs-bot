@@ -80,7 +80,7 @@ class DataSource extends EventEmitter {
         this.addServer(row.guild_id, 'fcfs!');
         this.saveServerSnowflakes.push(row.guild_id);
       }
-      this.servers[row.guild_id].addMonitoredChannel(data);
+      this.servers[row.guild_id].addChannelMonitor(data);
     }
 
     await sqlite.close(db)
@@ -93,11 +93,13 @@ class DataSource extends EventEmitter {
       if (!guild) {
         this.removeServer(id);
       } else if (guild.available) {
-        for (let monitorID in server.monitoredChannels) {
-          let monitoredChannel = server.monitoredChannels[monitorID];
-          if (!guild.channels.resolve(monitorID)
-          || !guild.channels.resolve(monitoredChannel.displayMessage)
-          || !guild.channels.resolve(monitoredChannel.displayChannel).messages.resolve(monitoredChannel.displayMessage)) {
+        for (let monitorID in server.channelMonitors) {
+          let channelMonitor = server.channelMonitors[monitorID];
+
+          let a = !guild.channels.resolve(monitorID);
+          let b = !guild.channels.resolve(channelMonitor.displayChannel);
+          let c = !(await guild.channels.resolve(channelMonitor.displayChannel).messages.fetch(channelMonitor.displayMessage));
+          if (a || b || c) {
             this.removeMonitor(id, monitorID);
           }
         }
@@ -192,13 +194,13 @@ class DataSource extends EventEmitter {
   }
 
   async removeMonitor(serverID, channelID) {
-    let displayChannelSnowflake = this.servers[serverID].monitoredChannels[channelID].displayChannel;
-    let displayMessageSnowflake = this.servers[serverID].monitoredChannels[channelID].displayMessage;
+    let displayChannelSnowflake = this.servers[serverID].channelMonitors[channelID].displayChannel;
+    let displayMessageSnowflake = this.servers[serverID].channelMonitors[channelID].displayMessage;
 
     // Empty catch because this might fail if someone deletes a message and who cares
     this.client.channels.resolve(displayChannelSnowflake).messages.delete(displayMessageSnowflake).catch(() => {});
 
-    this.servers[serverID].removeMonitoredChannel(channelID);
+    this.servers[serverID].removeChannelMonitor(channelID);
 
     this.removeMonitorSnowflakes.push(channelID);
 
@@ -236,7 +238,7 @@ class DataSource extends EventEmitter {
       
       let guildID = guild.id;
   
-      let monitor = this.servers[guildID].monitoredChannels[snowflake];
+      let monitor = this.servers[guildID].channelMonitors[snowflake];
 
       let v = [
         monitor.id,

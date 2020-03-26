@@ -14,17 +14,17 @@ class ListWaitingRoomsCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let monitoredChannels = server.monitoredChannels;
+    let channelMonitors = server.channelMonitors;
     
     let monitoredNames = [];
     let displayNames = [];
 
-    for (let snowflake in monitoredChannels) {
-      if (!monitoredChannels[snowflake].initialised) {
-        await monitoredChannels[snowflake].init();
+    for (let snowflake in channelMonitors) {
+      if (!channelMonitors[snowflake].initialised) {
+        await channelMonitors[snowflake].init();
       }
-      monitoredNames.push(monitoredChannels[snowflake].name);
-      displayNames.push(monitoredChannels[snowflake].displayChannelName);
+      monitoredNames.push(channelMonitors[snowflake].name);
+      displayNames.push(channelMonitors[snowflake].displayChannelName);
     }
 
     let lines = [];

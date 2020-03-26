@@ -27,16 +27,16 @@ class PingAfkCommand extends Command {
       return message.channel.send('Error: User is not in a voice channel');
     }
 
-    let monitoredChannel = server.monitoredChannels[voiceState.channelID];
+    let channelMonitor = server.channelMonitors[voiceState.channelID];
 
-    if (!monitoredChannel) {
+    if (!channelMonitor) {
       return message.channel.send('Error: User is not in a monitored channel');
     }
 
-    if (monitoredChannel.restrictedMode) {
+    if (channelMonitor.restrictedMode) {
       let sender = message.author;
       let senderMember = guild.members.resolve(sender.id);
-      if (!senderMember.permissions.has('ADMINISTRATOR') && !senderMember.roles.cache.some(role => monitoredChannel.allowedRoles.includes(role.id))) {
+      if (!senderMember.permissions.has('ADMINISTRATOR') && !senderMember.roles.cache.some(role => channelMonitor.allowedRoles.includes(role.id))) {
         return message.channel.send('That user is in a channel which is in Restricted Mode, and your roles don\'t allow you to do this!');
       }
     }
@@ -49,7 +49,7 @@ class PingAfkCommand extends Command {
           return ['👍'].includes(reaction.emoji.name) && user.id === message.author.id;
       };
 
-      msg.awaitReactions(filter, { max: 1, time: monitoredChannel.afkCheckDuration, errors: ['time'] })
+      msg.awaitReactions(filter, { max: 1, time: channelMonitor.afkCheckDuration, errors: ['time'] })
         .then(collected => {
             const reaction = collected.first();
 

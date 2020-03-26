@@ -13,8 +13,8 @@ class VoiceStateUpdateListener extends Listener {
       let guild = oldState.guild;
       if (guild.available) {
         let server = this.client.datasource.servers[guild.id];
-        let monitoredChannel = server.monitoredChannels[oldState.channelID];
-        if (monitoredChannel) monitoredChannel.timeoutRemoveUserFromQueue(oldState.id);
+        let channelMonitor = server.channelMonitors[oldState.channelID];
+        if (channelMonitor) channelMonitor.timeoutRemoveUserFromQueue(oldState.id);
       } else {
         console.error('A guild was not available!');
       }      
@@ -24,8 +24,8 @@ class VoiceStateUpdateListener extends Listener {
       let guild = newState.guild;
       if (guild.available) {
         let server = this.client.datasource.servers[guild.id];
-        let monitoredChannel = server.monitoredChannels[newState.channelID];
-        if (monitoredChannel) monitoredChannel.addUserToQueue(newState.id);
+        let channelMonitor = server.channelMonitors[newState.channelID];
+        if (channelMonitor) channelMonitor.addUserToQueue(newState.id);
       } else {
         console.error('A guild was not available!');
       }   

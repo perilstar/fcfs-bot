@@ -1,6 +1,6 @@
 const { VoiceChannel } = require('discord.js');
 
-class MonitoredChannel {
+class ChannelMonitor {
   constructor(client, data) {
     this.client = client;
 
@@ -116,4 +116,4 @@ class MonitoredChannel {
   }
 }
 
-module.exports = MonitoredChannel;
+module.exports = ChannelMonitor;

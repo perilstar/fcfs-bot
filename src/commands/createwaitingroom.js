@@ -46,21 +46,25 @@ class CreateWaitingRoomCommand extends Command {
       return message.channel.send(`Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
     }
 
-    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase().includes(args.monitorChannel.toLowerCase()));
+    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
     
     if (!monitorChannel) {
-      return message.channel.send(`Error: Channel \`${args.monitorChannel}\` does not exist!`);
+      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
     }
     if (monitorChannel.type != 'voice') {
       return message.channel.send(`Error: \`${args.monitorChannel}\` is not a voice channel!`);
     }
 
-    if (server.monitoredChannels[monitorChannel.id]) {
+    if (server.channelMonitors[monitorChannel.id]) {
       return message.channel.send(`Error: channel \`${args.monitorChannel}\` is already being monitored!`);
     }
 
     let rejoinWindow = parseDuration(args.rejoinWindow);
     let afkCheckDuration = parseDuration(args.afkCheckDuration);
+
+    if (args.firstN < 1 || args.firstN > 25) {
+      return message.channel.send('Error: `firstN` must be between 1 and 25');
+    }
 
     if (rejoinWindow < 0 || rejoinWindow > 60000) {
       return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 1 min');
@@ -97,8 +101,8 @@ class CreateWaitingRoomCommand extends Command {
 
     message.delete();
 
-    let monitoredChannel = server.addMonitoredChannel(data);
-    await monitoredChannel.init();
+    let channelMonitor = server.addChannelMonitor(data);
+    await channelMonitor.init();
     
     this.client.datasource.saveMonitor(monitorChannel.id);
   }

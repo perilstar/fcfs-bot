@@ -1,4 +1,4 @@
-const MonitoredChannel = require('./monitored_channel');
+const ChannelMonitor = require('./channel_monitor');
 
 class Server {
   constructor(client, id, prefix) {
@@ -6,21 +6,21 @@ class Server {
     this.id = id;
     this.prefix = prefix;
 
-    this.monitoredChannels = {};
+    this.channelMonitors = {};
   }
 
-  addMonitoredChannel(data) {
-    let monitoredChannel = new MonitoredChannel(this.client, data);
-    return this.monitoredChannels[data.id] = monitoredChannel;
+  addChannelMonitor(data) {
+    let channelMonitor = new ChannelMonitor(this.client, data);
+    return this.channelMonitors[data.id] = channelMonitor;
   }
 
-  removeMonitoredChannel(id) {
-    delete this.monitoredChannels[id];
+  removeChannelMonitor(id) {
+    delete this.channelMonitors[id];
   }
 
   async initMonitors() {
-    for (let id in this.monitoredChannels) {
-      await this.monitoredChannels[id].init();
+    for (let id in this.channelMonitors) {
+      await this.channelMonitors[id].init();
     }
   }
 }
