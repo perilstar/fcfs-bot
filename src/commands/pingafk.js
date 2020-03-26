@@ -35,7 +35,7 @@ class PingAfkCommand extends Command {
 
     if (monitoredChannel.restrictedMode) {
       let sender = message.author;
-      let senderMember = null;
+      let senderMember = guild.members.resolve(sender.id);
       if (!senderMember.roles.cache.some(role => monitoredChannel.allowedRoles.includes(role.id))) {
         return message.channel.send('That user is in a channel which is in Restricted Mode, and your roles don\'t allow you to do this!');
       }

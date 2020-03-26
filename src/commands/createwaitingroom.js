@@ -95,7 +95,7 @@ class CreateWaitingRoomCommand extends Command {
       firstN: args.firstN,
       rejoinWindow: args.rejoinWindow,
       afkCheckDuration: args.afkCheckDuration,
-      restrictedMode: false,
+      restrictedMode: true,
       allowedRoles: [],
       snowflakeQueue: []
     }
