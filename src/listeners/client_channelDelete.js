@@ -10,7 +10,11 @@ class ChannelDeleteListener extends Listener {
   }
 
   async removeMessage(monitoredChannel) {
-    this.client.channels.resolve(monitoredChannel.displayChannel).messages.delete(monitoredChannel.displayMessage).catch(err => console.log(err));
+    try {
+      this.client.channels.resolve(monitoredChannel.displayChannel).messages.delete(monitoredChannel.displayMessage);
+    } catch (err) {
+      // Empty catch because this might fail if someone deletes a message and who cares
+    }
   }
 
   async exec(channel) {
@@ -23,16 +27,14 @@ class ChannelDeleteListener extends Listener {
     if (channel.type == 'voice') {
       if (server.monitoredChannels[channel.id]) {
         this.removeMessage(server.monitoredChannels[channel.id]);
-        server.removeMonitoredChannel(channel.id);
-        ds.removeMonitor(channel.id);
+        ds.removeMonitor(server.id, channel.id);
       }
     }
 
     if (channel.type == 'text') {
-      for (snowflake in server.monitoredChannels) {
+      for (let snowflake in server.monitoredChannels) {
         if (server.monitoredChannels[snowflake].guildID = channel.guild.id) {
-          server.removeMonitoredChannel(snowflake);
-          ds.removeMonitor(snowflake);
+          ds.removeMonitor(server.id, snowflake);
         }
       }
     }

@@ -7,9 +7,14 @@ client.start();
 
 async function saveAndExit() {
   console.log('Saving...');
-  await client.datasource.save();
-  console.log('Data Saved.');
-  process.exit(0)
+  try {
+    await client.datasource.save();
+    console.log('Data Saved.');
+    process.exit(0);
+  } catch (err) {
+    console.log('ERROR! Exiting forcefully.');
+    process.exit(1);
+  }
 }
 
 process.on('SIGINT', saveAndExit);

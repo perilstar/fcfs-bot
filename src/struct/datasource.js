@@ -19,6 +19,9 @@ class DataSource extends EventEmitter {
   async revUpThoseFryers() {
     await this.init();
     await this.load();
+    await this.cleanupDeleted();
+    await this.initServers();
+    await this.save();
     this.emit('dataLoaded');
   }
 
@@ -77,12 +80,38 @@ class DataSource extends EventEmitter {
       }
       if (!this.servers[row.guild_id]) {
         this.addServer(row.guild_id, 'fcfs!');
-        this.saveServer(row.guild_id);
+        this.saveServerSnowflakes.push(row.guild_id);
       }
       this.servers[row.guild_id].addMonitoredChannel(data);
     }
 
     await sqlite.close(db)
+  }
+
+  async cleanupDeleted() {
+    for (let id in this.servers) {
+      let server = this.servers[id];
+      let guild = this.client.guilds.resolve(id);
+      if (!guild) {
+        this.removeServer(id);
+      } else {
+        for (let monitorID in server.monitoredChannels) {
+          let monitoredChannel = server.monitoredChannels[monitorID];
+          if (!guild.channels.resolve(monitorID)
+          || !guild.channels.resolve(monitoredChannel.displayMessage)
+          || !guild.channels.resolve(monitoredChannel.displayChannel).messages.resolve(monitoredChannel.displayMessage)) {
+            this.removeMonitor(id, monitorID);
+          }
+        }
+      }
+    }
+  }
+
+  
+  async initServers() {
+    for (let id in this.servers) {
+      await this.servers[id].initMonitors();
+    }
   }
 
   timeoutSave() {
@@ -162,8 +191,16 @@ class DataSource extends EventEmitter {
     this.removeServerSnowflakes = [];
   }
 
-  removeMonitor(snowflake) {
-    this.removeMonitorSnowflakes.push(snowflake);
+  async removeMonitor(serverID, channelID) {
+    let displayChannelSnowflake = this.servers[serverID].monitoredChannels[channelID].displayChannel;
+    let displayMessageSnowflake = this.servers[serverID].monitoredChannels[channelID].displayMessage;
+
+    // Empty catch because this might fail if someone deletes a message and who cares
+    this.client.channels.resolve(displayChannelSnowflake).messages.delete(displayMessageSnowflake).catch(() => {});
+
+    this.servers[serverID].removeMonitoredChannel(channelID);
+
+    this.removeMonitorSnowflakes.push(channelID);
 
     this.timeoutSave();
   }

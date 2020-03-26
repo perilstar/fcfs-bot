@@ -16,6 +16,12 @@ class Server {
   removeMonitoredChannel(id) {
     delete this.monitoredChannels[id];
   }
+
+  async initMonitors() {
+    for (let id in this.monitoredChannels) {
+      await this.monitoredChannels[id].init();
+    }
+  }
 }
 
 module.exports = Server;

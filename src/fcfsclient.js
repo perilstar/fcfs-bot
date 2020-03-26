@@ -1,6 +1,7 @@
 const { AkairoClient, CommandHandler, ListenerHandler } = require('discord-akairo');
 const { TextChannel } = require('discord.js');
 const DataSource = require('./struct/datasource');
+const ReadyListener = require('./listeners/client_ready');
 
 const TOKEN = process.env.FCFS_BOT_TOKEN;
 
@@ -36,9 +37,7 @@ class FCFSClient extends AkairoClient {
       datasource: this.datasource
     });
 
-    this.commandHandler.loadAll(); 
-    this.commandHandler.useListenerHandler(this.listenerHandler);
-    this.listenerHandler.loadAll(); 
+    this.listenerHandler.load(ReadyListener);
   }
 
   async start() {

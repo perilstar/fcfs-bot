@@ -19,9 +19,13 @@ class MonitoredChannel {
 
     this.removalTimers = {};
 
+    this.snowflakeQueue = data.snowflakeQueue;
+  }
+
+  async init() {
     this.channel = this.client.channels.resolve(this.id);
 
-    this.populateQueue(data.snowflakeQueue);
+    await this.populateQueue(this.snowflakeQueue);
 
     this.updateDisplay();
   }
@@ -34,6 +38,8 @@ class MonitoredChannel {
   async populateQueue(snowflakeQueue) {
     // Get rid of users who aren't in the channel anymore
     snowflakeQueue = snowflakeQueue.filter(id => this.channel.members.get(id) !== undefined);
+
+    this.queue = [];
 
     // Get users from queue data
     await Promise.all(snowflakeQueue.map(snowflake => this.client.users.fetch(snowflake))).then(users => {

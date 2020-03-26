@@ -1,0 +1,29 @@
+const { Listener } = require('discord-akairo');
+const { TextChannel } = require('discord.js');
+
+class MessageDeleteListener extends Listener {
+  constructor() {
+    super('messageDelete', {
+      emitter: 'client',
+      event: 'messageDelete'
+    });
+  }
+
+  async exec(message) {
+    let channel = message.channel;
+    if (!channel instanceof TextChannel) return;
+
+    let ds = this.client.datasource;
+
+    let server = ds.servers[channel.guild.id];
+
+    for (let snowflake in server.monitoredChannels) {
+      if (server.monitoredChannels[snowflake].guildID = channel.guild.id) {
+        ds.removeMonitor(server.id, snowflake);
+      }
+    }
+    
+  }
+}
+
+module.exports = MessageDeleteListener;
