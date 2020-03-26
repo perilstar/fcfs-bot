@@ -20,11 +20,13 @@ class DeleteWaitingRoomCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    if (!server.monitoredChannels[args.monitorChannel]) {
-      return message.channel.send(`Error: couldn't find a channel with ID \`${args.monitorChannel}\` that's being monitored!`);
+    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase().includes(args.monitorChannel.toLowerCase()));
+
+    if (!server.monitoredChannels[monitorChannel.id]) {
+      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
-    ds.removeMonitor(args.monitorChannel);
+    ds.removeMonitor(message.guild.id, monitorChannel.id);
 
     message.channel.send('Successfully deleted!');
   }

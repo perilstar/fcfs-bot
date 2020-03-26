@@ -10,7 +10,8 @@ class Server {
   }
 
   addMonitoredChannel(data) {
-    return this.monitoredChannels[data.id] = new MonitoredChannel(this.client, data);
+    let monitoredChannel = new MonitoredChannel(this.client, data);
+    return this.monitoredChannels[data.id] = monitoredChannel;
   }
 
   removeMonitoredChannel(id) {

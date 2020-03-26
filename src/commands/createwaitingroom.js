@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const parseDuration = require('parse-duration');
 
 class CreateWaitingRoomCommand extends Command {
   constructor() {
@@ -9,16 +10,8 @@ class CreateWaitingRoomCommand extends Command {
       userPermissions: ['ADMINISTRATOR'],
       args: [
         {
-          id: 'roomName',
-          type: 'string'
-        },
-        {
           id: 'monitorChannel',
           type: 'string',
-        },
-        {
-          id: 'displayChannel',
-          type: 'string'
         },
         {
           id: 'firstN',
@@ -26,11 +19,11 @@ class CreateWaitingRoomCommand extends Command {
         },
         {
           id: 'rejoinWindow',
-          type: 'number'
+          type: 'string'
         },
         {
           id: 'afkCheckDuration',
-          type: 'number'
+          type: 'string'
         }
       ]
     });
@@ -40,14 +33,8 @@ class CreateWaitingRoomCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    if (!args.roomName) {
-      return message.channel.send(`Error: Missing argument: \`roomName\`. Use fcfs!help for commands.`);
-    }
     if (!args.monitorChannel) {
       return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-    if (!args.displayChannel) {
-      return message.channel.send(`Error: Missing argument: \`displayChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.firstN) {
       return message.channel.send(`Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
@@ -59,53 +46,61 @@ class CreateWaitingRoomCommand extends Command {
       return message.channel.send(`Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
     }
 
+    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase().includes(args.monitorChannel.toLowerCase()));
     
-    if (!message.guild.channels.resolve(args.monitorChannel)) {
+    if (!monitorChannel) {
       return message.channel.send(`Error: Channel \`${args.monitorChannel}\` does not exist!`);
     }
-    if (message.guild.channels.resolve(args.monitorChannel).type != 'voice') {
+    if (monitorChannel.type != 'voice') {
       return message.channel.send(`Error: \`${args.monitorChannel}\` is not a voice channel!`);
     }
 
-    if (server.monitoredChannels[args.monitorChannel]) {
-      return message.channel.send(`Error: channel \`${args.roomName}\` is already being monitored!`);
+    if (server.monitoredChannels[monitorChannel.id]) {
+      return message.channel.send(`Error: channel \`${args.monitorChannel}\` is already being monitored!`);
     }
 
-    if (!message.guild.channels.resolve(args.displayChannel)) {
-      return message.channel.send(`Error: Channel \`${args.displayChannel}\` does not exist!`);
+    let rejoinWindow = parseDuration(args.rejoinWindow);
+    let afkCheckDuration = parseDuration(args.afkCheckDuration);
+
+    if (rejoinWindow < 0 || rejoinWindow > 60000) {
+      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 1 min');
     }
-    if (message.guild.channels.resolve(args.displayChannel).type != 'text') {
-      return message.channel.send(`Error: \`${args.displayChannel}\` is not a text channel!`);
+
+    if (afkCheckDuration < 15000 || rejoinWindow > 600000) {
+      return message.channel.send('Error: `afkCheckDuration` must be between 15 sec and 10 min');
     }
+
+    let displayChannel = message.channel;
 
     let displayMessage = '';
 
-    try {
-      displayMessage = await message.guild.channels.resolve(args.displayChannel).send('<Pending Update>');
-    } catch (err) {
-      return message.channel.send('Something went wrong. Does the bot have permissions to send messages in `displayChannel`?')
-    }
+    await message.channel.send('<Pending Update>')
+      .then(msg => {
+        displayMessage = msg;
+      })
+      .catch(err => {
+        return message.channel.send('Something went wrong. Does the bot have permissions to send messages in `displayChannel`?');
+      });
 
     let data = {
       guildID: message.guild.id,
-      id: args.monitorChannel,
-      name: args.roomName,
-      displayChannel: args.displayChannel,
+      id: monitorChannel.id,
+      displayChannel: displayChannel.id,
       displayMessage: displayMessage.id,
       firstN: args.firstN,
-      rejoinWindow: args.rejoinWindow,
-      afkCheckDuration: args.afkCheckDuration,
+      rejoinWindow: rejoinWindow,
+      afkCheckDuration: afkCheckDuration,
       restrictedMode: true,
       allowedRoles: [],
       snowflakeQueue: []
     }
 
+    message.delete();
+
     let monitoredChannel = server.addMonitoredChannel(data);
     await monitoredChannel.init();
     
-    this.client.datasource.saveMonitor(args.monitorChannel)
-
-    return message.channel.send('Success!');
+    this.client.datasource.saveMonitor(monitorChannel.id);
   }
 }
 

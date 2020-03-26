@@ -31,7 +31,6 @@ class DataSource extends EventEmitter {
     await db.run(`CREATE TABLE IF NOT EXISTS monitor (
       id TEXT PRIMARY KEY,
       guild_id TEXT,
-      name TEXT,
       display_channel TEXT,
       display_message TEXT,
       first_n INTEGER,
@@ -68,7 +67,6 @@ class DataSource extends EventEmitter {
       let data = {
         id: row.id,
         guildID: row.guild_id,
-        name: row.name,
         displayChannel: row.display_channel,
         displayMessage: row.display_message,
         firstN: row.first_n,
@@ -165,7 +163,7 @@ class DataSource extends EventEmitter {
   }
 
   addServer(snowflake, prefix = 'fcfs!') {
-    this.servers[snowflake] = new Server(this.client, snowflake, prefix)
+    this.servers[snowflake] = new Server(this.client, snowflake, prefix);
   }
 
   removeServer(snowflake) {
@@ -231,7 +229,7 @@ class DataSource extends EventEmitter {
     let values = [];
 
     for (let snowflake of this.saveMonitorSnowflakes) {
-      let guild = this.client.channels.resolve(snowflake).guild
+      let guild = this.client.channels.resolve(snowflake).guild;
       if (!guild.available) return;
       
       let guildID = guild.id;
@@ -241,7 +239,6 @@ class DataSource extends EventEmitter {
       let v = [
         monitor.id,
         monitor.guildID,
-        monitor.name,
         monitor.displayChannel,
         monitor.displayMessage,
         monitor.firstN,
@@ -252,20 +249,19 @@ class DataSource extends EventEmitter {
         monitor.queue.map(member => member.id).join(',')
       ];
 
-      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
       values = values.concat(v);
     }
 
     this.saveMonitorSnowflakes = [];
 
 
-    let sql = `INSERT INTO monitor (id, guild_id, name, display_channel, display_message,
+    let sql = `INSERT INTO monitor (id, guild_id, display_channel, display_message,
       first_n, rejoin_window, afk_check_duration, restricted_mode, allowed_roles, queue)
     VALUES ${placeholders.join(', ')}
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
     guild_id = excluded.guild_id,
-    name = excluded.name,
     display_channel = excluded.display_channel,
     display_message = excluded.display_message,
     first_n = excluded.first_n,

@@ -16,35 +16,18 @@ class ListWaitingRoomsCommand extends Command {
 
     let monitoredChannels = server.monitoredChannels;
     
-    let names = [];
-    let snowflakes = [];
-
-    let monitoredPromises = [];
-    let displayPromises = [];
-
-    for (let snowflake in monitoredChannels) {
-      names.push(monitoredChannels[snowflake].name);
-      snowflakes.push(snowflake);
-
-      monitoredPromises.push(this.client.channels.fetch(snowflake));
-      displayPromises.push(this.client.channels.fetch(monitoredChannels[snowflake].displayChannel));
-    }
-
     let monitoredNames = [];
     let displayNames = [];
 
-    await Promise.all(monitoredPromises).then(channels => {
-      monitoredNames = channels.map(channel => channel.name);
-    });
-
-    await Promise.all(displayPromises).then(channels => {
-      displayNames = channels.map(channel => channel.name);
-    });
+    for (let snowflake in monitoredChannels) {
+      monitoredNames.push(monitoredChannels[snowflake].name);
+      displayNames.push(monitoredChannels[snowflake].displayChannelName);
+    }
 
     let lines = [];
 
-    for (let i = 0; i < names.length; i++) {
-      lines.push(`[${snowflakes[i]}] '${names[i]}' monitors '${monitoredNames[i]}' and displays in '${displayNames[i]}'`)
+    for (let i = 0; i < monitoredNames.length; i++) {
+      lines.push(`'${monitoredNames[i]}' queue is displayed in '#${displayNames[i]}'`)
     }
 
     let text = '```\n' + lines.join('\n') + '\n```';

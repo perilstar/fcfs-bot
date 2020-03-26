@@ -6,7 +6,6 @@ class MonitoredChannel {
 
     this.guildID = data.guildID
     this.id = data.id;
-    this.name = data.name;
 
     this.displayChannel = data.displayChannel;
     this.displayMessage = data.displayMessage;
@@ -24,6 +23,9 @@ class MonitoredChannel {
 
   async init() {
     this.channel = this.client.channels.resolve(this.id);
+    this.name = this.channel.name;
+
+    this.displayChannelName = this.client.channels.resolve(this.displayChannel).name;
 
     await this.populateQueue(this.snowflakeQueue);
 
