@@ -108,7 +108,9 @@ class DataSource extends EventEmitter {
   
   async initServers() {
     for (let id in this.servers) {
-      await this.servers[id].initMonitors();
+      if (this.client.guilds.resolve(id).available) {
+        await this.servers[id].initMonitors();
+      }
     }
   }
 

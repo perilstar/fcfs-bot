@@ -19,6 +19,8 @@ class MonitoredChannel {
     this.removalTimers = {};
 
     this.snowflakeQueue = data.snowflakeQueue;
+
+    this.initialised = false;
   }
 
   async init() {
@@ -30,6 +32,8 @@ class MonitoredChannel {
     await this.populateQueue(this.snowflakeQueue);
 
     this.updateDisplay();
+
+    this.initialised = true;
   }
 
   setRestrictedMode(mode) {
@@ -70,7 +74,8 @@ class MonitoredChannel {
     return title + '\n```\n' + (top || '<EMPTY>') + '\n```';
   }
 
-  addUserToQueue(userID) {
+  async addUserToQueue(userID) {
+    if (!this.initialised) await this.init();
     if (this.removalTimers[userID]) {
       clearTimeout(this.removalTimers[userID]);
       delete this.removalTimers[userID];
@@ -85,7 +90,8 @@ class MonitoredChannel {
     this.removalTimers[userID] = setTimeout(() => this.removeUserFromQueue(userID), this.rejoinWindow);
   }
 
-  removeUserFromQueue(userID) {
+  async removeUserFromQueue(userID) {
+    if (!this.initialised) await this.init();
     let removeIndex = this.queue.findIndex(el => el.id == userID)
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
@@ -97,7 +103,8 @@ class MonitoredChannel {
     this.updateTimer = setTimeout(() => this.updateDisplay(), 1500);
   }
 
-  updateDisplay() {
+  async updateDisplay() {
+    if (!this.initialised) await this.init();
     this.updateTimer = null;
     try {
       this.client.channels.resolve(this.displayChannel).messages.fetch(this.displayMessage).then(message => {

@@ -20,6 +20,9 @@ class ListWaitingRoomsCommand extends Command {
     let displayNames = [];
 
     for (let snowflake in monitoredChannels) {
+      if (!monitoredChannels[snowflake].initialised) {
+        await monitoredChannels[snowflake].init();
+      }
       monitoredNames.push(monitoredChannels[snowflake].name);
       displayNames.push(monitoredChannels[snowflake].displayChannelName);
     }
