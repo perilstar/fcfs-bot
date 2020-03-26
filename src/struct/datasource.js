@@ -92,7 +92,7 @@ class DataSource extends EventEmitter {
       let guild = this.client.guilds.resolve(id);
       if (!guild) {
         this.removeServer(id);
-      } else {
+      } else if (guild.available) {
         for (let monitorID in server.monitoredChannels) {
           let monitoredChannel = server.monitoredChannels[monitorID];
           if (!guild.channels.resolve(monitorID)
