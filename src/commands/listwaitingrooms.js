@@ -51,7 +51,7 @@ class ListWaitingRoomsCommand extends Command {
       currentPage = lines.slice((page - 1) * 10, 10);
     }
 
-    let text = '```\n' + currentPage.join('\n') + '\n```';
+    let text = '```\n' + currentPage.join('\n') + '\n\nPage ' + page + '/' + pages + '```';
 
     message.channel.send(text);
   }
