@@ -1,6 +1,7 @@
 const sqlite = require('sqlite')
 const EventEmitter = require('events');
 const Server = require('./server');
+const fs = require('fs');
 
 class DataSource extends EventEmitter {
   constructor(client) {
@@ -26,6 +27,8 @@ class DataSource extends EventEmitter {
   }
 
   async init() {
+    if (!fs.existsSync('./db')) fs.mkdirSync('./db');
+
     let db = await sqlite.open('./db/fcfs.db');
 
     await db.run(`CREATE TABLE IF NOT EXISTS monitor (
