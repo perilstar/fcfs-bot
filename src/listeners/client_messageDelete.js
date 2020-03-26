@@ -18,7 +18,7 @@ class MessageDeleteListener extends Listener {
     let server = ds.servers[channel.guild.id];
 
     for (let snowflake in server.monitoredChannels) {
-      if (server.monitoredChannels[snowflake].guildID = channel.guild.id) {
+      if (server.monitoredChannels[snowflake].displayMessage = message.id) {
         ds.removeMonitor(server.id, snowflake);
       }
     }
