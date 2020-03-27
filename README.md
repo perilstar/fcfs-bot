@@ -22,6 +22,9 @@ Deletes the waiting room associated with `monitorChannel`.
 `info "<monitorChannel>"`  
 Displays information about the waiting room associated with `monitorChannel`.
 
+`(checkposition|position|p)`
+Displays your place in the queue.
+
 `(pingafk|ping|afkcheck) <mention>`  
 DMs the mentioned user and disconnects them if they don\'t respond in time.
 

@@ -31,6 +31,9 @@ class HelpCommand extends Command {
       '`info "<monitorChannel>"`',
       'Displays information about the waiting room associated with `monitorChannel`.',
       '',
+      '`(checkposition|position|p)`',
+      'Displays your place in the queue.',
+      '',
       '`(pingafk|ping|afkcheck) <mention>`',
       'DMs the mentioned user and disconnects them if they don\'t respond in time.',
       '',
@@ -52,7 +55,7 @@ class HelpCommand extends Command {
       'BUGS? Create an issue on the GitHub repository:',
       '<https://github.com/perilstar/fcfs-bot>',
       '',
-      '`v0.1.0 by perilstar with help from StKWarrior`'
+      '`v0.2.0 by perilstar with help from StKWarrior`'
     ]
     return message.channel.send(lines.join('\n'));
   }
