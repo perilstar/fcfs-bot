@@ -31,7 +31,7 @@ class SetAfkCheckDurationCommand extends Command {
 
     let afkCheckDuration = parseDuration(args.afkCheckDuration);
 
-    if (afkCheckDuration < 15000 || rejoinWindow > 900000) {
+    if (afkCheckDuration < 15000 || afkCheckDuration > 900000) {
       return message.channel.send('Error: `afkCheckDuration` must be between 15 sec and 15 min');
     }
 
