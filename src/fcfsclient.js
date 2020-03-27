@@ -1,4 +1,4 @@
-const { AkairoClient, CommandHandler, ListenerHandler } = require('discord-akairo');
+const { AkairoClient, CommandHandler, InhibitorHandler, ListenerHandler } = require('discord-akairo');
 const { TextChannel } = require('discord.js');
 const DataSource = require('./struct/datasource');
 const ReadyListener = require('./listeners/client_ready');
@@ -31,11 +31,15 @@ class FCFSClient extends AkairoClient {
         directory: './src/listeners/'
     });
 
+    this.inhibitorHandler = new InhibitorHandler(this, {});
+
     this.listenerHandler.setEmitters({
       commandHandler: this.commandHandler,
+      inhibitorHandler: this.inhibitorHandler,
       listenerHandler: this.listenerHandler,
       datasource: this.datasource
     });
+
 
     this.listenerHandler.load(ReadyListener);
   }
