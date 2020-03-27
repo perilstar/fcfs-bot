@@ -37,11 +37,6 @@ class ChannelMonitor {
     this.initialised = true;
   }
 
-  setRestrictedMode(mode) {
-    this.restrictedMode = mode;
-    // save somehow
-  }
-
   async populateQueue(snowflakeQueue) {
     // Get rid of users who aren't in the channel anymore
     snowflakeQueue = snowflakeQueue.filter(id => this.channel.members.get(id) !== undefined);
@@ -62,6 +57,10 @@ class ChannelMonitor {
         this.queue.push(guildMember.user);
       }
     }
+
+    this.queue = this.queue.filter((value, index, self) => {
+      return self.indexOf(value) === index
+    });
 
     this.client.datasource.saveMonitor(this.id);
   }
@@ -94,9 +93,14 @@ class ChannelMonitor {
   async removeUserFromQueue(userID) {
     if (!this.initialised) await this.init();
     let removeIndex = this.queue.findIndex(el => el.id == userID)
+    if (removeIndex == -1) {
+      console.log('tried to remove a user that wasn\'t in queue')
+      return;
+    }
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
     this.client.datasource.saveMonitor(this.id);
+    delete this.removalTimers[userID];
   }
 
   timeoutUpdateDisplay() {
