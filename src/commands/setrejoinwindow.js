@@ -31,8 +31,8 @@ class SetRejoinWindowCommand extends Command {
 
     let rejoinWindow = parseDuration(args.rejoinWindow);
 
-    if (rejoinWindow < 0 || rejoinWindow > 60000) {
-      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 1 min');
+    if (rejoinWindow < 0 || rejoinWindow > 600000) {
+      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 10 min');
     }
 
     let ds = this.client.datasource;

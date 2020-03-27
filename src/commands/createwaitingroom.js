@@ -66,12 +66,12 @@ class CreateWaitingRoomCommand extends Command {
       return message.channel.send('Error: `firstN` must be between 1 and 25');
     }
 
-    if (rejoinWindow < 0 || rejoinWindow > 60000) {
-      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 1 min');
+    if (rejoinWindow < 0 || rejoinWindow > 600000) {
+      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 10 min');
     }
 
-    if (afkCheckDuration < 15000 || rejoinWindow > 600000) {
-      return message.channel.send('Error: `afkCheckDuration` must be between 15 sec and 10 min');
+    if (afkCheckDuration < 15000 || rejoinWindow > 900000) {
+      return message.channel.send('Error: `afkCheckDuration` must be between 15 sec and 15 min');
     }
 
     let displayChannel = message.channel;
