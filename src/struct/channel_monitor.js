@@ -4,7 +4,7 @@ class ChannelMonitor {
   constructor(client, data) {
     this.client = client;
 
-    this.guildID = data.guildID
+    this.guildID = data.guildID;
     this.id = data.id;
 
     this.displayChannel = data.displayChannel;
@@ -59,7 +59,7 @@ class ChannelMonitor {
     }
 
     this.queue = this.queue.filter((value, index, self) => {
-      return self.indexOf(value) === index
+      return self.indexOf(value) === index;
     });
 
     this.client.datasource.saveMonitor(this.id);
