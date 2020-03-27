@@ -46,7 +46,7 @@ class PingAfkCommand extends Command {
       msg.react('👍');
 
       const filter = (reaction, user) => {
-          return ['👍'].includes(reaction.emoji.name) && user.id === message.author.id;
+          return ['👍'].includes(reaction.emoji.name) && user.id === mention.id;
       };
 
       msg.awaitReactions(filter, { max: 1, time: channelMonitor.afkCheckDuration, errors: ['time'] })
