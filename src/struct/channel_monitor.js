@@ -16,6 +16,7 @@ class ChannelMonitor {
     this.restrictedMode = data.restrictedMode;
     this.allowedRoles = data.allowedRoles;
 
+    this.lastAfkChecked = {};
     this.removalTimers = {};
 
     this.snowflakeQueue = data.snowflakeQueue;

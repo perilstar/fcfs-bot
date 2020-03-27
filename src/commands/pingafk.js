@@ -41,6 +41,11 @@ class PingAfkCommand extends Command {
       }
     }
 
+    if ((Date.now() - channelMonitor.lastAfkChecked[mention.id]) < 10000) {
+      return message.channel.send('Please don\'t spam the AFK Check command on that user! (Think of the pings!)');
+    }
+    channelMonitor.lastAfkChecked[mention.id] = Date.now() + channelMonitor.afkCheckDuration;
+
     let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
     mention.send(mentionMessage).then(msg => {
       msg.react('👍');
@@ -55,6 +60,7 @@ class PingAfkCommand extends Command {
 
             if (reaction.emoji.name === '👍') {
               msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
+              channelMonitor.lastAfkChecked[mention.id] = Date.now();
             }
         })
         .catch(collected => {
