@@ -78,15 +78,7 @@ class CreateWaitingRoomCommand extends Command {
 
     let displayChannel = message.channel;
 
-    let displayMessage = '';
-
-    await sendmessage(message.channel, '<Pending Update>')
-      .then(msg => {
-        displayMessage = msg;
-      })
-      .catch(err => {
-        return sendmessage(message.channel, 'Something went wrong. Does the bot have permissions to send messages in `displayChannel`?');
-      });
+    let displayMessage = await message.channel.send('<Pending Update>').catch(() => {});
 
     let data = {
       guildID: message.guild.id,

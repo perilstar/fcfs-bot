@@ -11,7 +11,7 @@ class MakePancakesCommand extends Command {
   }
 
   async exec(message, args) {
-    returnsendmessage(message.channel, '🥞');
+    return sendmessage(message.channel, '🥞');
   }
 }
 

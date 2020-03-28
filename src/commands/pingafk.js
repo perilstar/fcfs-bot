@@ -47,6 +47,8 @@ class PingAfkCommand extends Command {
     }
     channelMonitor.lastAfkChecked[mention.id] = Date.now() + channelMonitor.afkCheckDuration;
 
+    let resultsMessage = await message.channel.send('AFK-checking...');
+
     let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
     mention.send(mentionMessage).then(msg => {
       msg.react('👍');
@@ -61,16 +63,16 @@ class PingAfkCommand extends Command {
 
             if (reaction.emoji.name === '👍') {
               msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
+              resultsMessage.edit('User is not AFK. Keeping them in the queue.').catch(() => {});
               channelMonitor.lastAfkChecked[mention.id] = Date.now();
             }
         })
         .catch(collected => {
           voiceState.kick();
-
+          resultsMessage.edit('User is AFK. Removing them from the queue.').catch(() => {});
           msg.reply('You failed to react to the message in time. You have been removed from the queue.');
         });
     });
-    return sendmessage(message.channel, 'AFK-checking')
   }
 }
 
