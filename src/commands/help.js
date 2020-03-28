@@ -38,13 +38,16 @@ class HelpCommand extends Command {
       'DMs the mentioned user and disconnects them if they don\'t respond in time.',
       '',
       '`(setrestrictedmode|srm) "<monitorChannel>" [on|off]`',
-      'Sets whether only users with roles can use the pingafk command for users in `monitorChannel`.',
+      'Sets whether only users with mod roles can use the pingafk command for users in `monitorChannel`.',
       '',
-      '`(addallowedrole|aar) "<monitorChannel>" <roleName>`',
+      '`(addmodrole|amr) "<monitorChannel>" <roleName>`',
       'Adds a role that can use pingafk if the target is in `monitorChannel`.',
       '',
-      '`(removeallowedrole|rar) "<monitorChannel>" <roleName>`',
+      '`(removemodrole|rmr) "<monitorChannel>" <roleName>`',
       'Removes a role that can use pingafk if the target is in `monitorChannel`.',
+      '',
+      '`(listmodroles|lmr) "<monitorChannel>"`',
+      'Lists roles that can use pingafk if the target is in `monitorChannel`.',
       '',
       '`(setfirstn|sfn) "<monitorChannel>" <firstN>`,',
       '`(setrejoinwindow|srw) "<monitorChannel>" <rejoinWindow>`,',
@@ -55,7 +58,7 @@ class HelpCommand extends Command {
       'BUGS? Create an issue on the GitHub repository:',
       '<https://github.com/perilstar/fcfs-bot>',
       '',
-      '`v0.2.0 by perilstar with help from StKWarrior`'
+      '`v1.0.0 by perilstar with help from StKWarrior`'
     ]
     return message.channel.send(lines.join('\n'));
   }

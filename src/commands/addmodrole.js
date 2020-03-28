@@ -1,12 +1,13 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 
-class AddAllowedRoleCommand extends Command {
+class AddModRoleCommand extends Command {
   constructor() {
-    super('addallowedrole', {
-      aliases: ['addallowedrole', 'add-allowedrole', 'aar'],
+    super('addmodrole', {
+      aliases: ['addmodrole', 'add-modrole', 'amr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',
@@ -50,21 +51,21 @@ class AddAllowedRoleCommand extends Command {
       await channelMonitor.init();
     }
 
-    let allowedRoles = channelMonitor.allowedRoles;
+    let modRoles = channelMonitor.modRoles;
 
-    if (allowedRoles.length >= 10) {
-      return message.channel.send(`Error: You can not add more than 10 roles per waiting room!`);
+    if (modRoles.length >= 10) {
+      return message.channel.send(`Error: You can not add more than 10 mod roles per waiting room!`);
     }
 
-    if (allowedRoles.includes(role.id)) {
-      return message.channel.send(`Error: That role is already added to the waiting room!`);
+    if (modRoles.includes(role.id)) {
+      return message.channel.send(`Error: That mod role is already added to the waiting room!`);
     }
 
-    channelMonitor.allowedRoles.push(role.id);
+    channelMonitor.modRoles.push(role.id);
     ds.saveMonitor(channelMonitor.id);
 
     message.channel.send('Successfully added role!');
   }
 }
 
-module.exports = AddAllowedRoleCommand;
+module.exports = AddModRoleCommand;

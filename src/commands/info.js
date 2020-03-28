@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 
 class InfoCommand extends Command {
   constructor() {
@@ -6,7 +7,7 @@ class InfoCommand extends Command {
       aliases: ['info', 'wr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',
@@ -53,10 +54,10 @@ class InfoCommand extends Command {
       lines.push('Roles allowed to AFK Check:');
     }
 
-    let allowedRoles = channelMonitor.allowedRoles;
+    let modRoles = channelMonitor.modRoles;
 
-    if (allowedRoles.length) {
-      lines = lines.concat(allowedRoles.map(roleID => {
+    if (modRoles.length) {
+      lines = lines.concat(modRoles.map(roleID => {
         let role = message.guild.roles.resolve(roleID);
         return `  ${role.name} (ID ${roleID})`;
       }))

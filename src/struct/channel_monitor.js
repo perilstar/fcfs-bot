@@ -14,7 +14,7 @@ class ChannelMonitor {
     this.firstN = data.firstN;
     this.afkCheckDuration = data.afkCheckDuration;
     this.restrictedMode = data.restrictedMode;
-    this.allowedRoles = data.allowedRoles;
+    this.modRoles = data.modRoles;
 
     this.lastAfkChecked = {};
     this.removalTimers = {};

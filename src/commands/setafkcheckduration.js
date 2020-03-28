@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
+const mps = require('../util/missingpermissionsupplier');
 
 class SetAfkCheckDurationCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class SetAfkCheckDurationCommand extends Command {
       aliases: ['setafkcheckduration', 'set-afkcheckduration', 'set-afk-check-duration', 'sacd'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',

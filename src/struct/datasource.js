@@ -21,9 +21,9 @@ class DataSource extends EventEmitter {
     await this.init();
     await this.load();
     await this.cleanupDeleted();
+    await this.addMissed();
     await this.initServers();
     await this.save();
-    this.emit('dataLoaded');
   }
 
   async init() {
@@ -40,13 +40,14 @@ class DataSource extends EventEmitter {
       rejoin_window INTEGER,
       afk_check_duration INTEGER,
       restricted_mode INTEGER,
-      allowed_roles TEXT,
+      mod_roles TEXT,
       queue TEXT
     )`);
 
     await db.run(`CREATE TABLE IF NOT EXISTS server (
       id TEXT PRIMARY KEY,
-      bot_prefix TEXT
+      bot_prefix TEXT,
+      admin_roles TEXT
     )`);
 
     await sqlite.close(db)
@@ -60,7 +61,8 @@ class DataSource extends EventEmitter {
     let result = await db.all(sql, []);
     
     for (let row of result) {
-      this.addServer(row.id, row.bot_prefix);
+      let adminRoles = row.admin_roles.split(',').filter(Boolean)
+      this.addServer(row.id, row.bot_prefix, adminRoles);
     }
 
     sql = `SELECT * FROM monitor`
@@ -76,11 +78,11 @@ class DataSource extends EventEmitter {
         rejoinWindow: row.rejoin_window,
         afkCheckDuration: row.afk_check_duration,
         restrictedMode: row.restricted_mode === 1,
-        allowedRoles: row.allowed_roles.split(',').filter(Boolean),
+        modRoles: row.mod_roles.split(',').filter(Boolean),
         snowflakeQueue: row.queue.split(',').filter(Boolean)
       }
       if (!this.servers[row.guild_id]) {
-        this.addServer(row.guild_id, 'fcfs!');
+        this.addServer(row.guild_id, 'fcfs!', []);
         this.saveServerSnowflakes.push(row.guild_id);
       }
       this.servers[row.guild_id].addChannelMonitor(data);
@@ -106,6 +108,16 @@ class DataSource extends EventEmitter {
             this.removeMonitor(id, monitorID);
           }
         }
+      }
+    }
+  }
+
+  addMissed() {
+    let currentlyInGuilds = this.client.guilds.cache.keys();
+    for (let snowflake of currentlyInGuilds) {
+      if (!this.servers[snowflake]) {
+        this.addServer(snowflake, 'fcfs!', []);
+        this.saveServerSnowflakes.push(snowflake);
       }
     }
   }
@@ -151,26 +163,28 @@ class DataSource extends EventEmitter {
       
       let v = [
         server.id,
-        server.prefix
+        server.prefix,
+        server.adminRoles.join(',')
       ];
     
-      placeholders.push('(?, ?)');
+      placeholders.push('(?, ?, ?)');
       values = values.concat(v);
     }
 
     this.saveServerSnowflakes = [];
 
-    let sql = `INSERT INTO server (id, bot_prefix)
+    let sql = `INSERT INTO server (id, bot_prefix, admin_roles)
     VALUES ${placeholders.join(', ')}
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
-    bot_prefix = excluded.bot_prefix`;
+    bot_prefix = excluded.bot_prefix,
+    admin_roles = excluded.admin_roles`;
     
     await db.run(sql, values);
   }
 
-  addServer(snowflake, prefix = 'fcfs!') {
-    this.servers[snowflake] = new Server(this.client, snowflake, prefix);
+  addServer(snowflake, prefix = 'fcfs!', adminRoles) {
+    this.servers[snowflake] = new Server(this.client, snowflake, prefix, adminRoles);
   }
 
   removeServer(snowflake) {
@@ -252,7 +266,7 @@ class DataSource extends EventEmitter {
         monitor.rejoinWindow,
         monitor.afkCheckDuration,
         monitor.restrictedMode ? 1 : 0,
-        monitor.allowedRoles.join(','),
+        monitor.modRoles.join(','),
         monitor.queue.map(member => member.id).join(',')
       ];
 
@@ -264,7 +278,7 @@ class DataSource extends EventEmitter {
 
 
     let sql = `INSERT INTO monitor (id, guild_id, display_channel, display_message,
-      first_n, rejoin_window, afk_check_duration, restricted_mode, allowed_roles, queue)
+      first_n, rejoin_window, afk_check_duration, restricted_mode, mod_roles, queue)
     VALUES ${placeholders.join(', ')}
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
@@ -275,7 +289,7 @@ class DataSource extends EventEmitter {
     rejoin_window = excluded.rejoin_window,
     afk_check_duration = excluded.afk_check_duration,
     restricted_mode = excluded.restricted_mode,
-    allowed_roles = excluded.allowed_roles,
+    mod_roles = excluded.mod_roles,
     queue = excluded.queue`;
 
     await db.run(sql, values);

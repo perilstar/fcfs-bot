@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 
 class DeleteWaitingRoomCommand extends Command {
   constructor() {
@@ -6,7 +7,7 @@ class DeleteWaitingRoomCommand extends Command {
       aliases: ['deletewaitingroom', 'dwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',

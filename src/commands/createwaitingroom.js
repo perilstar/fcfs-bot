@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
+const mps = require('../util/missingpermissionsupplier');
 
 class CreateWaitingRoomCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class CreateWaitingRoomCommand extends Command {
       aliases: ['createwaitingroom', 'cwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',
@@ -95,7 +96,7 @@ class CreateWaitingRoomCommand extends Command {
       rejoinWindow: rejoinWindow,
       afkCheckDuration: afkCheckDuration,
       restrictedMode: true,
-      allowedRoles: [],
+      modRoles: [],
       snowflakeQueue: []
     }
 

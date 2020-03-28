@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 
 class ListWaitingRoomsCommand extends Command {
   constructor() {
@@ -6,7 +7,7 @@ class ListWaitingRoomsCommand extends Command {
       aliases: ['listwaitingrooms', 'lwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'page',

@@ -29,10 +29,16 @@ Displays your place in the queue.
 DMs the mentioned user and disconnects them if they don\'t respond in time.
 
 `(setrestrictedmode|srm) "<monitorChannel>" [on|off]`  
-Sets whether only users with roles can use the pingafk command for users in `monitorChannel`.
+Sets whether only users with mod roles can use the pingafk command for users in `monitorChannel`.
 
-`(addallowedrole|aar) "<monitorChannel>" <roleName>`  
+`(addmodrole|aar) "<monitorChannel>" <roleName>`  
 Adds a role that can use pingafk if the target is in `monitorChannel`.
+
+`(removemodrole|rmr) "<monitorChannel>" <roleName>`
+Removes a role that can use pingafk if the target is in `monitorChannel`.
+
+`(listmodroles|lmr) "<monitorChannel>"`
+Lists roles that can use pingafk if the target is in `monitorChannel`.
 
 `(setfirstn|sfn) "<monitorChannel>" <firstN>`,  
 `(setrejoinwindow|srw) "<monitorChannel>" <rejoinWindow>`,  

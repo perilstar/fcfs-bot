@@ -10,7 +10,7 @@ class MissingPermissionsListener extends Listener {
 
   exec(message, command, type, missing) {
     if (type == 'user') {
-      message.channel.send('Missing permissions! Are you an Administrator?');
+      message.channel.send('Missing permissions to do this!');
     }
   }
 }

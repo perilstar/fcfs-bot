@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 
 class SetFirstNCommand extends Command {
   constructor() {
@@ -6,7 +7,7 @@ class SetFirstNCommand extends Command {
       aliases: ['setfirstn', 'set-firstn', 'set-first-n', 'sfn'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',

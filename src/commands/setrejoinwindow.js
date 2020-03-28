@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
+const mps = require('../util/missingpermissionsupplier');
 
 class SetRejoinWindowCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class SetRejoinWindowCommand extends Command {
       aliases: ['setrejoinwindow', 'set-rejoinwindow', 'set-rejoin-window', 'srw'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',

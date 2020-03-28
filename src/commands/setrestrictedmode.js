@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
+const mps = require('../util/missingpermissionsupplier');
 
 class SetRestrictedModeCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class SetRestrictedModeCommand extends Command {
       aliases: ['setrestrictedmode', 'set-restrictedmode', 'set-restricted-mode', 'srm'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',

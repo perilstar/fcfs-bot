@@ -5,8 +5,7 @@ class CheckPositionCommand extends Command {
     super('checkposition', {
       aliases: ['checkposition', 'position', 'p'],
       split: 'quoted',
-      channel: 'guild',
-      userPermissions: ['ADMINISTRATOR']
+      channel: 'guild'
     });
   }
 

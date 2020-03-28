@@ -1,12 +1,13 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 
-class RemoveAllowedRoleCommand extends Command {
+class RemoveModRoleCommand extends Command {
   constructor() {
-    super('removeallowedrole', {
-      aliases: ['removeallowedrole', 'remove-allowedrole', 'rar'],
+    super('removemodrole', {
+      aliases: ['removemodrole', 'remove-modrole', 'rmr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: ['ADMINISTRATOR'],
+      userPermissions: mps,
       args: [
         {
           id: 'monitorChannel',
@@ -50,18 +51,18 @@ class RemoveAllowedRoleCommand extends Command {
       await channelMonitor.init();
     }
 
-    let allowedRoles = channelMonitor.allowedRoles;
+    let modRoles = channelMonitor.modRoles;
 
-    if (!allowedRoles.includes(role.id)) {
-      return message.channel.send(`Error: That role is not added to the waiting room!`);
+    if (!modRoles.includes(role.id)) {
+      return message.channel.send(`Error: That mod role is not added to the waiting room!`);
     }
 
-    let index = channelMonitor.allowedRoles.indexOf(role.id);
-    channelMonitor.allowedRoles.splice(index, 1);
+    let index = channelMonitor.modRoles.indexOf(role.id);
+    channelMonitor.modRoles.splice(index, 1);
     ds.saveMonitor(channelMonitor.id);
 
     message.channel.send('Successfully removed role!');
   }
 }
 
-module.exports = RemoveAllowedRoleCommand;
+module.exports = RemoveModRoleCommand;
