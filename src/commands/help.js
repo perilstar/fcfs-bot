@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const { TextChannel } = require('discord.js');
 const sendmessage = require('../util/sendmessage');
 
 class HelpCommand extends Command {
@@ -14,6 +15,15 @@ class HelpCommand extends Command {
       '',
       '**__Commands__**',
       'default prefix: fcfs!',
+      '',
+      '`(addadminrole|aar) <roleName>`',
+      'Adds a bot admin role.',
+      '',
+      '`(removeadminrole|rar) <roleName>`',
+      'Removes a bot admin role.',
+      '',
+      '`(listadminroles|lar)`',
+      'Lists bot admin roles.',
       '',
       '`setprefix <prefix>`',
       'Changes the bot prefix in this server.',
@@ -41,13 +51,13 @@ class HelpCommand extends Command {
       'Sets whether only users with mod roles can use the pingafk command for users in `monitorChannel`.',
       '',
       '`(addmodrole|amr) "<monitorChannel>" <roleName>`',
-      'Adds a role that can use pingafk if the target is in `monitorChannel`.',
+      'Adds a mod role for `monitorChannel`.',
       '',
       '`(removemodrole|rmr) "<monitorChannel>" <roleName>`',
-      'Removes a role that can use pingafk if the target is in `monitorChannel`.',
+      'Removes a mod role for `monitorChannel`.',
       '',
       '`(listmodroles|lmr) "<monitorChannel>"`',
-      'Lists roles that can use pingafk if the target is in `monitorChannel`.',
+      'Lists mod roles for `monitorChannel`.',
       '',
       '`(setfirstn|sfn) "<monitorChannel>" <firstN>`,',
       '`(setrejoinwindow|srw) "<monitorChannel>" <rejoinWindow>`,',
@@ -60,7 +70,17 @@ class HelpCommand extends Command {
       '',
       '`v1.0.0 by perilstar with help from StKWarrior`'
     ]
-    return sendmessage(message.channel, lines.join('\n'));
+
+    let dmChannel = message.author.dmChannel;
+
+    if (!dmChannel) {
+      dmChannel = await message.author.createDM();
+    }
+
+    if (message.channel instanceof TextChannel) {
+      sendmessage(message.channel, 'Sending you a DM with the help message!');
+    }
+    return sendmessage(dmChannel, lines.join('\n'));
   }
 }
 

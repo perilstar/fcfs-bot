@@ -6,6 +6,15 @@ A Discord bot that enhances First Come, First Serve in voice channel waiting roo
 **__Commands__**  
 default prefix: fcfs!
 
+`(addadminrole|aar) <roleName>`
+Adds a bot admin role.
+
+`(removeadminrole|rar) <roleName>`
+Removes a bot admin role.
+
+`(listadminroles|lar)`
+Lists bot admin roles.
+
 `setprefix <prefix>`  
 Changes the bot prefix in this server.
 
@@ -32,13 +41,13 @@ DMs the mentioned user and disconnects them if they don\'t respond in time.
 Sets whether only users with mod roles can use the pingafk command for users in `monitorChannel`.
 
 `(addmodrole|aar) "<monitorChannel>" <roleName>`  
-Adds a role that can use pingafk if the target is in `monitorChannel`.
+Adds a mod role for `monitorChannel`.
 
 `(removemodrole|rmr) "<monitorChannel>" <roleName>`
-Removes a role that can use pingafk if the target is in `monitorChannel`.
+Removes a mod role for `monitorChannel`.
 
 `(listmodroles|lmr) "<monitorChannel>"`
-Lists roles that can use pingafk if the target is in `monitorChannel`.
+Lists mod roles for `monitorChannel`.
 
 `(setfirstn|sfn) "<monitorChannel>" <firstN>`,  
 `(setrejoinwindow|srw) "<monitorChannel>" <rejoinWindow>`,  
