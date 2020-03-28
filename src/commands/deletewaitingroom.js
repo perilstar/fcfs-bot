@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class DeleteWaitingRoomCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class DeleteWaitingRoomCommand extends Command {
       aliases: ['deletewaitingroom', 'dwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -19,7 +20,7 @@ class DeleteWaitingRoomCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
@@ -28,16 +29,16 @@ class DeleteWaitingRoomCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!monitorChannel) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
     }
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     ds.removeMonitor(message.guild.id, monitorChannel.id);
 
-    message.channel.send('Successfully deleted!');
+    return sendmessage(message.channel, 'Successfully deleted!');
   }
 }
 

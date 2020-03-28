@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class SetAfkCheckDurationCommand extends Command {
   constructor() {
@@ -8,7 +9,7 @@ class SetAfkCheckDurationCommand extends Command {
       aliases: ['setafkcheckduration', 'set-afkcheckduration', 'set-afk-check-duration', 'sacd'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -24,16 +25,16 @@ class SetAfkCheckDurationCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.afkCheckDuration) {
-      return message.channel.send(`Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
     }
 
     let afkCheckDuration = parseDuration(args.afkCheckDuration);
 
     if (afkCheckDuration < 15000 || afkCheckDuration > 900000) {
-      return message.channel.send('Error: `afkCheckDuration` must be between 15 sec and 15 min');
+      return sendmessage(message.channel, 'Error: `afkCheckDuration` must be between 15 sec and 15 min');
     }
 
     let ds = this.client.datasource;
@@ -42,7 +43,7 @@ class SetAfkCheckDurationCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -54,7 +55,7 @@ class SetAfkCheckDurationCommand extends Command {
     channelMonitor.afkCheckDuration = afkCheckDuration;
     ds.saveMonitor(channelMonitor.id);
 
-    message.channel.send('Successfully changed!');
+    return sendmessage(message.channel, 'Successfully changed!');
   }
 }
 

@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class AddModRoleCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class AddModRoleCommand extends Command {
       aliases: ['addmodrole', 'add-modrole', 'amr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -23,17 +24,17 @@ class AddModRoleCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
     if (!args.role) {
-      return message.channel.send(`Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
     }
 
     let role = message.guild.roles.cache.find(r => r.name === args.role);
 
     if (!role) {
-      return message.channel.send(`Error: Couldn't find a role called \`${args.role}\`!`);
+      return sendmessage(message.channel, `Error: Couldn't find a role called \`${args.role}\`!`);
     }
 
     let ds = this.client.datasource;
@@ -42,7 +43,7 @@ class AddModRoleCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -54,17 +55,17 @@ class AddModRoleCommand extends Command {
     let modRoles = channelMonitor.modRoles;
 
     if (modRoles.length >= 10) {
-      return message.channel.send(`Error: You can not add more than 10 mod roles per waiting room!`);
+      return sendmessage(message.channel, `Error: You can not add more than 10 mod roles per waiting room!`);
     }
 
     if (modRoles.includes(role.id)) {
-      return message.channel.send(`Error: That mod role is already added to the waiting room!`);
+      return sendmessage(message.channel, `Error: That mod role is already added to the waiting room!`);
     }
 
     channelMonitor.modRoles.push(role.id);
     ds.saveMonitor(channelMonitor.id);
 
-    message.channel.send('Successfully added role!');
+    return sendmessage(message.channel, 'Successfully added role!');
   }
 }
 

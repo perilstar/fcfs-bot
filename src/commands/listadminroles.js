@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class ListAdminRolesCommand extends Command {
   constructor() {
@@ -28,7 +29,7 @@ class ListAdminRolesCommand extends Command {
 
     let text = '```\n' + lines.join('\n') + '\n```';
 
-    message.channel.send(text);
+    return sendmessage(message.channel, text);
   }
 }
 

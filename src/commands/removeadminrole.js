@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const sendmessage = require('../util/sendmessage');
 
 class RemoveAdminRoleCommand extends Command {
   constructor() {
@@ -18,13 +19,13 @@ class RemoveAdminRoleCommand extends Command {
 
   async exec(message, args) {
     if (!args.role) {
-      return message.channel.send(`Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
     }
 
     let role = message.guild.roles.cache.find(r => r.name === args.role);
 
     if (!role) {
-      return message.channel.send(`Error: Couldn't find a role called \`${args.role}\`!`);
+      return sendmessage(message.channel, `Error: Couldn't find a role called \`${args.role}\`!`);
     }
 
     let ds = this.client.datasource;
@@ -33,14 +34,14 @@ class RemoveAdminRoleCommand extends Command {
     let adminRoles = server.adminRoles;
 
     if (!adminRoles.includes(role.id)) {
-      return message.channel.send(`Error: That role is not set as bot admin!`);
+      return sendmessage(message.channel, `Error: That role is not set as bot admin!`);
     }
 
     let index = server.adminRoles.indexOf(role.id);
     server.modRoles.splice(index, 1);
     ds.saveServer(server.id);
 
-    message.channel.send('Successfully removed role!');
+    return sendmessage(message.channel, 'Successfully removed role!');
   }
 }
 

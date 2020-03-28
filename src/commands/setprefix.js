@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class SetPrefixCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class SetPrefixCommand extends Command {
       aliases: ['setprefix', 'set-prefix', 'prefix'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'prefix',
@@ -22,14 +23,14 @@ class SetPrefixCommand extends Command {
     let server = ds.servers[message.guild.id];
 
     if (!args.prefix) {
-      return message.channel.send(`Error: Missing argument: \`prefix\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`prefix\`. Use fcfs!help for commands.`);
     }
     
     server.prefix = args.prefix;
     
     this.client.datasource.saveServer(message.guild.id);
 
-    return message.channel.send('Success!');
+    return sendmessage(message.channel, 'Success!');
   }
 }
 

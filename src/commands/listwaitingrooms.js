@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class ListWaitingRoomsCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class ListWaitingRoomsCommand extends Command {
       aliases: ['listwaitingrooms', 'lwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'page',
@@ -54,7 +55,7 @@ class ListWaitingRoomsCommand extends Command {
 
     let text = '```\n' + currentPage.join('\n') + '\n\nPage ' + page + '/' + pages + '```';
 
-    message.channel.send(text);
+    return sendmessage(message.channel, text);
   }
 }
 

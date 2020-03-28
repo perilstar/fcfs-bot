@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class CreateWaitingRoomCommand extends Command {
   constructor() {
@@ -8,7 +9,7 @@ class CreateWaitingRoomCommand extends Command {
       aliases: ['createwaitingroom', 'cwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -35,56 +36,56 @@ class CreateWaitingRoomCommand extends Command {
     let server = ds.servers[message.guild.id];
 
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.firstN) {
-      return message.channel.send(`Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
     }
     if (!args.rejoinWindow) {
-      return message.channel.send(`Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
     }
     if (!args.afkCheckDuration) {
-      return message.channel.send(`Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
     }
 
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
     
     if (!monitorChannel) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
     }
     if (monitorChannel.type != 'voice') {
-      return message.channel.send(`Error: \`${args.monitorChannel}\` is not a voice channel!`);
+      return sendmessage(message.channel, `Error: \`${args.monitorChannel}\` is not a voice channel!`);
     }
 
     if (server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: channel \`${args.monitorChannel}\` is already being monitored!`);
+      return sendmessage(message.channel, `Error: channel \`${args.monitorChannel}\` is already being monitored!`);
     }
 
     let rejoinWindow = parseDuration(args.rejoinWindow);
     let afkCheckDuration = parseDuration(args.afkCheckDuration);
 
     if (args.firstN < 1 || args.firstN > 25) {
-      return message.channel.send('Error: `firstN` must be between 1 and 25');
+      return sendmessage(message.channel, 'Error: `firstN` must be between 1 and 25');
     }
 
     if (rejoinWindow < 0 || rejoinWindow > 600000) {
-      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 10 min');
+      return sendmessage(message.channel, 'Error: `rejoinWindow` must be between 0 sec and 10 min');
     }
 
     if (afkCheckDuration < 15000 || rejoinWindow > 900000) {
-      return message.channel.send('Error: `afkCheckDuration` must be between 15 sec and 15 min');
+      return sendmessage(message.channel, 'Error: `afkCheckDuration` must be between 15 sec and 15 min');
     }
 
     let displayChannel = message.channel;
 
     let displayMessage = '';
 
-    await message.channel.send('<Pending Update>')
+    await sendmessage(message.channel, '<Pending Update>')
       .then(msg => {
         displayMessage = msg;
       })
       .catch(err => {
-        return message.channel.send('Something went wrong. Does the bot have permissions to send messages in `displayChannel`?');
+        return sendmessage(message.channel, 'Something went wrong. Does the bot have permissions to send messages in `displayChannel`?');
       });
 
     let data = {

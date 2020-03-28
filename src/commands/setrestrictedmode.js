@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class SetRestrictedModeCommand extends Command {
   constructor() {
@@ -8,7 +9,7 @@ class SetRestrictedModeCommand extends Command {
       aliases: ['setrestrictedmode', 'set-restrictedmode', 'set-restricted-mode', 'srm'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -24,16 +25,16 @@ class SetRestrictedModeCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.rejoinWindow) {
-      return message.channel.send(`Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
     }
 
     let restrictedMode = args.restrictedMode.toLowerCase();
 
     if (!(restrictedMode === 'on' || restrictedMode === 'off')) {
-      return message.channel.send('Error: `restrictedMode` must be either `on` or `off`');
+      return sendmessage(message.channel, 'Error: `restrictedMode` must be either `on` or `off`');
     }
 
     let ds = this.client.datasource;
@@ -42,7 +43,7 @@ class SetRestrictedModeCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -54,7 +55,7 @@ class SetRestrictedModeCommand extends Command {
     channelMonitor.restrictedMode = restrictedMode;
     ds.saveMonitor(channelMonitor.id);
 
-    message.channel.send('Successfully changed!');
+    return sendmessage(message.channel, 'Successfully changed!');
   }
 }
 

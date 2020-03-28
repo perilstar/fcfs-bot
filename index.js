@@ -12,7 +12,7 @@ async function saveAndExit() {
     console.log('Data Saved.');
     process.exit(0);
   } catch (err) {
-    console.log('ERROR! Exiting forcefully.');
+    console.error('ERROR! Exiting forcefully.');
     process.exit(1);
   }
 }

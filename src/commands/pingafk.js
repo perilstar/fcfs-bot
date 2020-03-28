@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const sendmessage = require('../util/sendmessage');
 
 class PingAfkCommand extends Command {
   constructor() {
@@ -14,7 +15,7 @@ class PingAfkCommand extends Command {
     let mention = message.mentions.users.first();
   
     if (mention == null) {
-      return message.channel.send(`Error: Missing argument: \`mentionUser\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`mentionUser\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
@@ -24,25 +25,25 @@ class PingAfkCommand extends Command {
     let voiceState = guild.members.resolve(mention.id).voice;
 
     if (!voiceState.channelID) {
-      return message.channel.send('Error: User is not in a voice channel');
+      return sendmessage(message.channel, 'Error: User is not in a voice channel');
     }
 
     let channelMonitor = server.channelMonitors[voiceState.channelID];
 
     if (!channelMonitor) {
-      return message.channel.send('Error: User is not in a monitored channel');
+      return sendmessage(message.channel, 'Error: User is not in a monitored channel');
     }
 
     if (channelMonitor.restrictedMode) {
       let sender = message.author;
       let senderMember = guild.members.resolve(sender.id);
       if (!senderMember.permissions.has('ADMINISTRATOR') && !senderMember.roles.cache.some(role => channelMonitor.modRoles.includes(role.id))) {
-        return message.channel.send('That user is in a channel which is in Restricted Mode, and you aren\'t a mod for it!');
+        return sendmessage(message.channel, 'That user is in a channel which is in Restricted Mode, and you aren\'t a mod for it!');
       }
     }
 
     if ((Date.now() - channelMonitor.lastAfkChecked[mention.id]) < 10000) {
-      return message.channel.send('Please don\'t spam the AFK Check command on that user! (Think of the pings!)');
+      return sendmessage(message.channel, 'Please don\'t spam the AFK Check command on that user! (Think of the pings!)');
     }
     channelMonitor.lastAfkChecked[mention.id] = Date.now() + channelMonitor.afkCheckDuration;
 
@@ -69,7 +70,7 @@ class PingAfkCommand extends Command {
           msg.reply('You failed to react to the message in time. You have been removed from the queue.');
         });
     });
-    message.channel.send('AFK-checking...')
+    return sendmessage(message.channel, 'AFK-checking')
   }
 }
 

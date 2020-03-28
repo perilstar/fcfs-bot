@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class SetFirstNCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class SetFirstNCommand extends Command {
       aliases: ['setfirstn', 'set-firstn', 'set-first-n', 'sfn'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -23,14 +24,14 @@ class SetFirstNCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.firstN) {
-      return message.channel.send(`Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
     }
 
     if (args.firstN < 1 || args.firstN > 25) {
-      return message.channel.send('Error: `firstN` must be between 1 and 25');
+      return sendmessage(message.channel, 'Error: `firstN` must be between 1 and 25');
     }
 
     let ds = this.client.datasource;
@@ -39,7 +40,7 @@ class SetFirstNCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -52,7 +53,7 @@ class SetFirstNCommand extends Command {
     channelMonitor.updateDisplay();
     ds.saveMonitor(channelMonitor.id);
 
-    message.channel.send('Successfully changed!');
+    return sendmessage(message.channel, 'Successfully changed!');
   }
 }
 

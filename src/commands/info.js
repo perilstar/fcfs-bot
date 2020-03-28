@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class InfoCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class InfoCommand extends Command {
       aliases: ['info', 'wr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -19,7 +20,7 @@ class InfoCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
@@ -28,11 +29,11 @@ class InfoCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!monitorChannel) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
     }
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -65,7 +66,7 @@ class InfoCommand extends Command {
       lines.push('  <NONE>');
     }
 
-    message.channel.send('**Waiting Room Info**\n```\n' + lines.join('\n') + '\n```');
+    return sendmessage(message.channel, '**Waiting Room Info**\n```\n' + lines.join('\n') + '\n```');
   }
 }
 

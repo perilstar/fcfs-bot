@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class SetRejoinWindowCommand extends Command {
   constructor() {
@@ -8,7 +9,7 @@ class SetRejoinWindowCommand extends Command {
       aliases: ['setrejoinwindow', 'set-rejoinwindow', 'set-rejoin-window', 'srw'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -24,16 +25,16 @@ class SetRejoinWindowCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.rejoinWindow) {
-      return message.channel.send(`Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
     }
 
     let rejoinWindow = parseDuration(args.rejoinWindow);
 
     if (rejoinWindow < 0 || rejoinWindow > 600000) {
-      return message.channel.send('Error: `rejoinWindow` must be between 0 sec and 10 min');
+      return sendmessage(message.channel, 'Error: `rejoinWindow` must be between 0 sec and 10 min');
     }
 
     let ds = this.client.datasource;
@@ -42,7 +43,7 @@ class SetRejoinWindowCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -54,7 +55,7 @@ class SetRejoinWindowCommand extends Command {
     channelMonitor.rejoinWindow = rejoinWindow;
     ds.saveMonitor(channelMonitor.id);
 
-    message.channel.send('Successfully changed!');
+    return sendmessage(message.channel, 'Successfully changed!');
   }
 }
 

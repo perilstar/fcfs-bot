@@ -1,5 +1,5 @@
 const { Command } = require('discord-akairo');
-const { MessageEmbed } = require('discord.js');
+const sendmessage = require('../util/sendmessage');
 
 class HelpCommand extends Command {
   constructor() {
@@ -60,7 +60,7 @@ class HelpCommand extends Command {
       '',
       '`v1.0.0 by perilstar with help from StKWarrior`'
     ]
-    return message.channel.send(lines.join('\n'));
+    return sendmessage(message.channel, lines.join('\n'));
   }
 }
 

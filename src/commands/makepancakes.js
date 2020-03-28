@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const sendmessage = require('../util/sendmessage');
 
 class MakePancakesCommand extends Command {
   constructor() {
@@ -10,7 +11,7 @@ class MakePancakesCommand extends Command {
   }
 
   async exec(message, args) {
-    message.channel.send('🥞');
+    returnsendmessage(message.channel, '🥞');
   }
 }
 

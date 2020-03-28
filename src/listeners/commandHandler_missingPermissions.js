@@ -1,4 +1,5 @@
 const { Listener } = require('discord-akairo');
+const sendmessage = require('../util/sendmessage');
 
 class MissingPermissionsListener extends Listener {
   constructor() {
@@ -10,7 +11,10 @@ class MissingPermissionsListener extends Listener {
 
   exec(message, command, type, missing) {
     if (type == 'user') {
-      message.channel.send('Missing permissions to do this!');
+      return sendmessage(message.channel, 'Missing permissions to do this! Are you an Administrator?');
+    }
+    if (type == 'botAdmin') {
+      return sendmessage(message.channel, 'Missing permissions to do this! Are you a bot admin?')
     }
   }
 }

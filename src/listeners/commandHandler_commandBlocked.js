@@ -1,4 +1,5 @@
 const { Listener } = require('discord-akairo');
+const sendmessage = require('../util/sendmessage');
 
 class CommandBlockedListener extends Listener {
   constructor() {
@@ -10,7 +11,7 @@ class CommandBlockedListener extends Listener {
 
   exec(message, command, reason) {
     if (reason == 'guild') {
-      message.channel.send('You can only use this command in a guild!');
+      return sendmessage(message.channel, 'You can only use this command in a guild!');
     }
   }
 }

@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const mps = require('../util/missingpermissionsupplier');
+const sendmessage = require('../util/sendmessage');
 
 class RemoveModRoleCommand extends Command {
   constructor() {
@@ -7,7 +8,7 @@ class RemoveModRoleCommand extends Command {
       aliases: ['removemodrole', 'remove-modrole', 'rmr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: mps,
+      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -23,17 +24,17 @@ class RemoveModRoleCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return message.channel.send(`Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
     if (!args.role) {
-      return message.channel.send(`Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
     }
 
     let role = message.guild.roles.cache.find(r => r.name === args.role);
 
     if (!role) {
-      return message.channel.send(`Error: Couldn't find a role called \`${args.role}\`!`);
+      return sendmessage(message.channel, `Error: Couldn't find a role called \`${args.role}\`!`);
     }
 
     let ds = this.client.datasource;
@@ -42,7 +43,7 @@ class RemoveModRoleCommand extends Command {
     let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
 
     if (!server.channelMonitors[monitorChannel.id]) {
-      return message.channel.send(`Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[monitorChannel.id]
@@ -54,14 +55,14 @@ class RemoveModRoleCommand extends Command {
     let modRoles = channelMonitor.modRoles;
 
     if (!modRoles.includes(role.id)) {
-      return message.channel.send(`Error: That mod role is not added to the waiting room!`);
+      return sendmessage(message.channel, `Error: That mod role is not added to the waiting room!`);
     }
 
     let index = channelMonitor.modRoles.indexOf(role.id);
     channelMonitor.modRoles.splice(index, 1);
     ds.saveMonitor(channelMonitor.id);
 
-    message.channel.send('Successfully removed role!');
+    return sendmessage(message.channel, 'Successfully removed role!');
   }
 }
 
