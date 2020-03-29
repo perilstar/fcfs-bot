@@ -10,14 +10,13 @@ class ReadyListener extends Listener {
 
   async exec() {
     console.log('Getting client ready');
-    await this.client.user.setActivity("fcfs!help");
+    await this.client.user.setActivity(`fcfs!help | v${this.client.version}`);
     console.log('Client is ready!');
     if (this.client.ready) return;
     await this.client.datasource.revUpThoseFryers();
     this.client.commandHandler.loadAll(); 
     this.client.commandHandler.useListenerHandler(this.listenerHandler);
     this.client.listenerHandler.loadAll(this.client.listenerHandler.directory, path => !path.includes('client_ready.js'));
-    this.client.ready = true;
   }
 }
 
