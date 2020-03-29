@@ -111,6 +111,8 @@ class DataSource extends EventEmitter {
           if (a || b || c) {
             this.removeMonitor(id, monitorID);
           }
+          channelMonitor.modRoles = channelMonitor.modRoles.filter(roleID => availableRoles.includes(roleID));
+          this.saveMonitorSnowflakes.push(monitorID);
         }
       }
     }

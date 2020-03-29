@@ -21,6 +21,15 @@ class RoleDeleteListener extends Listener {
       server.adminRoles.splice(index, 1);
       ds.saveServer(server.id);
     }
+
+    for (let monitorID in server.channelMonitors) {
+      let channelMonitor = server.channelMonitors[monitorID]
+      let index = channelMonitor.modRoles.indexOf(role.id);
+      if (index != -1) {
+        channelMonitor.modRoles.splice(index, 1);
+        ds.saveMonitor(monitorID);
+      }
+    }
     
   }
 }
