@@ -68,7 +68,7 @@ class HelpCommand extends Command {
       'BUGS? Create an issue on the GitHub repository:',
       '<https://github.com/perilstar/fcfs-bot>',
       '',
-      '`v1.2.1 by perilstar with help from StKWarrior`'
+      '`v' + this.client.version + ' by perilstar with help from StKWarrior`'
     ]
 
     let dmChannel = message.author.dmChannel;

@@ -4,6 +4,7 @@ const DataSource = require('./struct/datasource');
 const ReadyListener = require('./listeners/client_ready');
 
 const TOKEN = process.env.FCFS_BOT_TOKEN;
+const version = require('../package.json').version;
 
 class FCFSClient extends AkairoClient {
   constructor() {
@@ -39,8 +40,9 @@ class FCFSClient extends AkairoClient {
       listenerHandler: this.listenerHandler
     });
 
-
     this.listenerHandler.load(ReadyListener);
+
+    this.version = version;
   }
 
   async start() {
