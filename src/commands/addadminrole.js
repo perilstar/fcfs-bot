@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const sendmessage = require('../util/sendmessage');
 
 class AddAdminRoleCommand extends Command {
   constructor() {

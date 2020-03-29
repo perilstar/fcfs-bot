@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const mps = require('../util/missingpermissionsupplier');
 const sendmessage = require('../util/sendmessage');
 
 class PingAfkCommand extends Command {
@@ -37,8 +38,8 @@ class PingAfkCommand extends Command {
     if (channelMonitor.restrictedMode) {
       let sender = message.author;
       let senderMember = guild.members.resolve(sender.id);
-      if (!senderMember.permissions.has('ADMINISTRATOR') && !senderMember.roles.cache.some(role => channelMonitor.modRoles.includes(role.id))) {
-        return sendmessage(message.channel, 'That user is in a channel which is in Restricted Mode, and you aren\'t a mod for it!');
+      if (mps(this.client, message) && !senderMember.roles.cache.some(role => channelMonitor.modRoles.includes(role.id))) {
+        return sendmessage(message.channel, 'That user is in a channel which is in Restricted Mode, and you aren\'t a mod for it or a bot admin!');
       }
     }
 

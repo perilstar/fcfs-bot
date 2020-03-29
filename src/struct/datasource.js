@@ -61,7 +61,7 @@ class DataSource extends EventEmitter {
     let result = await db.all(sql, []);
     
     for (let row of result) {
-      let adminRoles = row.admin_roles.split(',').filter(Boolean)
+      let adminRoles = row.admin_roles.split(',').filter(Boolean);
       this.addServer(row.id, row.bot_prefix, adminRoles);
     }
 
@@ -98,6 +98,10 @@ class DataSource extends EventEmitter {
       if (!guild) {
         this.removeServer(id);
       } else if (guild.available) {
+        let availableRoles = this.client.guilds.resolve(id).roles.cache.keyArray();
+        this.servers[id].adminRoles = this.servers[id].adminRoles.filter(roleID => availableRoles.includes(roleID));
+        this.saveServerSnowflakes.push(id);
+
         for (let monitorID in server.channelMonitors) {
           let channelMonitor = server.channelMonitors[monitorID];
 
@@ -113,7 +117,7 @@ class DataSource extends EventEmitter {
   }
 
   addMissed() {
-    let currentlyInGuilds = this.client.guilds.cache.keys();
+    let currentlyInGuilds = this.client.guilds.cache.keyArray();
     for (let snowflake of currentlyInGuilds) {
       if (!this.servers[snowflake]) {
         this.addServer(snowflake, 'fcfs!', []);
@@ -154,6 +158,9 @@ class DataSource extends EventEmitter {
 
   async saveServers(db) {
     if (!this.saveServerSnowflakes.length) return;
+    this.saveServerSnowflakes = this.saveServerSnowflakes.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
 
     let placeholders = [];
     let values = [];
@@ -245,6 +252,10 @@ class DataSource extends EventEmitter {
 
   async saveMonitors(db) {
     if (!this.saveMonitorSnowflakes.length) return;
+
+    this.saveMonitorSnowflakes = this.saveMonitorSnowflakes.filter((value, index, self) => {
+      return self.indexOf(value) === index;
+    });
 
     let placeholders = [];
     let values = [];
