@@ -36,8 +36,7 @@ class FCFSClient extends AkairoClient {
     this.listenerHandler.setEmitters({
       commandHandler: this.commandHandler,
       inhibitorHandler: this.inhibitorHandler,
-      listenerHandler: this.listenerHandler,
-      datasource: this.datasource
+      listenerHandler: this.listenerHandler
     });
 
 
