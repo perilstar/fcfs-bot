@@ -47,7 +47,7 @@ class SetPositionCommand extends Command {
     }
 
     let position = args.position - 1;
-    let index = channelMonitor.queue.findIndex(user => user.id == message.author.id);
+    let index = channelMonitor.queue.findIndex(user => user.id == args.member.id);
     channelMonitor.queue.splice(index, 1);
     channelMonitor.queue = [].concat(channelMonitor.queue.slice(0, position), args.member.user, channelMonitor.queue.slice(position));
     let newPosition = channelMonitor.queue.findIndex(user => user.id == args.member.id) + 1;
