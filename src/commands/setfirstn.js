@@ -16,7 +16,7 @@ class SetFirstNCommand extends Command {
         },
         {
           id: 'firstN',
-          type: 'number'
+          type: 'integer'
         }
       ]
     });

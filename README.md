@@ -3,7 +3,7 @@ First Come, First Serve
 
 A Discord bot that enhances First Come, First Serve in voice channel waiting rooms. 
 
-**__Commands__**  
+__Commands__  
 default prefix: fcfs!
 
 `(addadminrole|aar) <roleName>`
@@ -23,16 +23,19 @@ Creates a monitor for the channel specified by `monitorChannel` that displays th
 Example: `fcfs!cwr "Waiting Room 1" 10 5s 20s`
 
 `(listwaitingrooms|lwr) [page]`  
-Displays a paged list of waiting rooms on the server.
+Displays a list of waiting rooms on the server.
 
 `(deletewaitingroom|dwr) "<monitorChannel>"`  
 Deletes the waiting room associated with `monitorChannel`.
 
 `info "<monitorChannel>"`  
-Displays information about the waiting room associated with `monitorChannel`.
+Displays information about `monitorChannel`.
 
 `(checkposition|position|p)`
-Displays your place in the queue.
+Displays your place in queue.
+
+`(setposition|sp) <member> <position>`
+Sets a user\'s position in queue.
 
 `(pingafk|ping|afkcheck) <mention>`  
 DMs the mentioned user and disconnects them if they don\'t respond in time.

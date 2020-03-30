@@ -8,7 +8,6 @@ class InfoCommand extends Command {
       aliases: ['info', 'wr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: (message) => mps(this.client, message),
       args: [
         {
           id: 'monitorChannel',

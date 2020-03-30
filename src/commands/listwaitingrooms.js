@@ -12,7 +12,7 @@ class ListWaitingRoomsCommand extends Command {
       args: [
         {
           id: 'page',
-          type: 'number'
+          type: 'integer'
         }
       ]
     });

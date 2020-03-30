@@ -7,32 +7,35 @@ class PingAfkCommand extends Command {
     super('pingafk', {
       aliases: ['pingafk', 'afk', 'afkcheck'],
       split: 'quoted',
-      channel: 'guild'
+      channel: 'guild',
+      args: [
+        {
+          id: 'member',
+          type: 'member'
+        }
+      ]
     });
   }
 
   async exec(message, args) {
-
-    let mention = message.mentions.users.first();
-  
-    if (mention == null) {
-      return sendmessage(message.channel, `Error: Missing argument: \`mentionUser\`. Use fcfs!help for commands.`);
+    if (!args.member) {
+      return sendmessage(message.channel, `Error: Missing argument: \`member\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
     let guild = this.client.guilds.resolve(message.guild.id);
 
-    let voiceState = guild.members.resolve(mention.id).voice;
+    let voiceState = args.member.voice;
 
     if (!voiceState.channelID) {
-      return sendmessage(message.channel, 'Error: User is not in a voice channel');
+      return sendmessage(message.channel, `Error: \`${member.displayName}\` is not in a voice channel`);
     }
 
     let channelMonitor = server.channelMonitors[voiceState.channelID];
 
     if (!channelMonitor) {
-      return sendmessage(message.channel, 'Error: User is not in a monitored channel');
+      return sendmessage(message.channel, `Error: \`${member.displayName}\` is not in a monitored channel`);
     }
 
     if (channelMonitor.restrictedMode) {
@@ -43,19 +46,19 @@ class PingAfkCommand extends Command {
       }
     }
 
-    if ((Date.now() - channelMonitor.lastAfkChecked[mention.id]) < 10000) {
+    if ((Date.now() - channelMonitor.lastAfkChecked[args.member.id]) < 10000) {
       return sendmessage(message.channel, 'Please don\'t spam the AFK Check command on that user! (Think of the pings!)');
     }
-    channelMonitor.lastAfkChecked[mention.id] = Date.now() + channelMonitor.afkCheckDuration;
+    channelMonitor.lastAfkChecked[args.member.id] = Date.now() + channelMonitor.afkCheckDuration;
 
     let resultsMessage = await message.channel.send('AFK-checking...');
 
     let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
-    mention.send(mentionMessage).then(msg => {
+    args.member.send(mentionMessage).then(msg => {
       msg.react('👍');
 
       const filter = (reaction, user) => {
-          return ['👍'].includes(reaction.emoji.name) && user.id === mention.id;
+          return ['👍'].includes(reaction.emoji.name) && user.id === args.member.id;
       };
 
       msg.awaitReactions(filter, { max: 1, time: channelMonitor.afkCheckDuration, errors: ['time'] })
@@ -65,7 +68,7 @@ class PingAfkCommand extends Command {
             if (reaction.emoji.name === '👍') {
               msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
               resultsMessage.edit('User is not AFK. Keeping them in the queue.').catch(() => {});
-              channelMonitor.lastAfkChecked[mention.id] = Date.now();
+              channelMonitor.lastAfkChecked[args.member.id] = Date.now();
             }
         })
         .catch(collected => {

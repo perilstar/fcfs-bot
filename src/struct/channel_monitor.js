@@ -45,8 +45,8 @@ class ChannelMonitor {
 
     // Get users from queue data
     await Promise.all(snowflakeQueue.map(snowflake => this.client.users.fetch(snowflake))).then(users => {
-      this.queue = users;
-    })
+      this.queue = users.filter(Boolean);
+    });
 
     // If there's users missing from the queue, add them in a random order
     if (this.queue.length < this.channel.members.size) {
@@ -68,7 +68,7 @@ class ChannelMonitor {
   get message() {
     let guild = this.client.guilds.resolve(this.guildID);
 
-    let title = `**${this.name} Queue:**`;
+    let title = `\`${this.name}\` **Queue:**`;
     let top = this.queue.slice(0, this.firstN).map(user => `${guild.members.cache.get(user.id).displayName} (${user.tag})`).join('\n');
 
     return title + '\n```\n' + (top || '<EMPTY>') + '\n```';
