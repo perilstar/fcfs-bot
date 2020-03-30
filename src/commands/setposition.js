@@ -51,6 +51,7 @@ class SetPositionCommand extends Command {
     channelMonitor.queue.splice(index, 1);
     channelMonitor.queue = [].concat(channelMonitor.queue.slice(0, position), args.member.user, channelMonitor.queue.slice(position));
     let newPosition = channelMonitor.queue.findIndex(user => user.id == args.member.id) + 1;
+    channelMonitor.timeoutUpdateDisplay();
     ds.saveMonitor(channelMonitor.id);
 
     return sendmessage(message.channel, `\`${args.member.displayName}\`'s new position in \`${channelMonitor.name}\`: ${newPosition}`);
