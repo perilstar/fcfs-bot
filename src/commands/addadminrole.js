@@ -11,7 +11,7 @@ class AddAdminRoleCommand extends Command {
       args: [
         {
           id: 'role',
-          type: 'string'
+          type: 'role'
         }
       ]
     });
@@ -19,13 +19,7 @@ class AddAdminRoleCommand extends Command {
 
   async exec(message, args) {
     if (!args.role) {
-      return sendmessage(message.channel, `Error: Missing argument: \`role\`. Use fcfs!help for commands.`);
-    }
-
-    let role = message.guild.roles.cache.find(r => r.name === args.role);
-
-    if (!role) {
-      return sendmessage(message.channel, `Error: Couldn't find a role called \`${args.role}\`!`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`role\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
@@ -37,14 +31,14 @@ class AddAdminRoleCommand extends Command {
       return sendmessage(message.channel, `Error: You can not add more than 10 roles as bot admin!`);
     }
 
-    if (adminRoles.includes(role.id)) {
-      return sendmessage(message.channel, `Error: That role is already set as bot admin!`);
+    if (adminRoles.includes(args.role.id)) {
+      return sendmessage(message.channel, `Error: ${args.role.name} is already set as bot admin!`);
     }
 
-    server.adminRoles.push(role.id);
+    server.adminRoles.push(args.role.id);
     ds.saveServer(server.id);
 
-    return sendmessage(message.channel, 'Successfully added role!');
+    return sendmessage(message.channel, `Successfully added role ${args.role.name} as a bot admin!`);
   }
 }
 

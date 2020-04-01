@@ -18,6 +18,8 @@ class ListAdminRolesCommand extends Command {
 
     let adminRoles = server.adminRoles
 
+    let lines = [];
+
     if (adminRoles.length) {
       lines = lines.concat(adminRoles.map(roleID => {
         let role = message.guild.roles.resolve(roleID);

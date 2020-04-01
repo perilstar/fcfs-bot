@@ -12,7 +12,7 @@ class DeleteWaitingRoomCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'string',
+          type: 'voiceChannel',
         }
       ]
     });
@@ -20,20 +20,14 @@ class DeleteWaitingRoomCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
-
-    if (!monitorChannel) {
-      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
-    }
-
-    if (!server.channelMonitors[monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+    if (!server.channelMonitors[args.monitorChannel.id]) {
+      return sendmessage(message.channel, `Error: couldn't find a channel called ${args.monitorChannel} that's being monitored!`);
     }
 
     ds.removeMonitor(message.guild.id, monitorChannel.id);

@@ -1,5 +1,4 @@
 const { Command } = require('discord-akairo');
-const { TextChannel } = require('discord.js');
 const sendmessage = require('../util/sendmessage');
 
 class VersionCommand extends Command {

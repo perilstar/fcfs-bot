@@ -13,11 +13,11 @@ class CreateWaitingRoomCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'string',
+          type: 'voiceChannel',
         },
         {
           id: 'firstN',
-          type: 'number'
+          type: 'integer'
         },
         {
           id: 'rejoinWindow',
@@ -36,29 +36,20 @@ class CreateWaitingRoomCommand extends Command {
     let server = ds.servers[message.guild.id];
 
     if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.firstN) {
-      return sendmessage(message.channel, `Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`firstN\`. Use fcfs!help for commands.`);
     }
     if (!args.rejoinWindow) {
-      return sendmessage(message.channel, `Error: Missing argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
     }
     if (!args.afkCheckDuration) {
-      return sendmessage(message.channel, `Error: Missing argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
     }
 
-    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
-    
-    if (!monitorChannel) {
-      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\`!`);
-    }
-    if (monitorChannel.type != 'voice') {
-      return sendmessage(message.channel, `Error: \`${args.monitorChannel}\` is not a voice channel!`);
-    }
-
-    if (server.channelMonitors[monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: channel \`${args.monitorChannel}\` is already being monitored!`);
+    if (server.channelMonitors[args.monitorChannel.id]) {
+      return sendmessage(message.channel, `Error: channel ${args.monitorChannel} is already being monitored!`);
     }
 
     let rejoinWindow = parseDuration(args.rejoinWindow);
@@ -82,7 +73,7 @@ class CreateWaitingRoomCommand extends Command {
 
     let data = {
       guildID: message.guild.id,
-      id: monitorChannel.id,
+      id: args.monitorChannel.id,
       displayChannel: displayChannel.id,
       displayMessage: displayMessage.id,
       firstN: args.firstN,
@@ -98,7 +89,7 @@ class CreateWaitingRoomCommand extends Command {
     let channelMonitor = server.addChannelMonitor(data);
     await channelMonitor.init();
     
-    this.client.datasource.saveMonitor(monitorChannel.id);
+    this.client.datasource.saveMonitor(args.monitorChannel.id);
   }
 }
 

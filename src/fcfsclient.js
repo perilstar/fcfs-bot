@@ -40,6 +40,7 @@ class FCFSClient extends AkairoClient {
       listenerHandler: this.listenerHandler
     });
 
+    // Other listeners are loaded after the bot is ready, in client_ready.js
     this.listenerHandler.load(ReadyListener);
 
     this.version = version;

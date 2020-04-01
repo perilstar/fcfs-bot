@@ -1,6 +1,9 @@
+const { Util } = require('discord.js');
+
 async function sendmessage(channel, text) {
   if (channel.deleted) return console.error('Failed to send message in deleted channel!');
-  channel.send(text)
+  let cleanContent = Util.removeMentions(text);
+  channel.send(cleanContent)
     .then(msg => {
       return msg;
     })

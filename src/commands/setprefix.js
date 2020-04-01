@@ -23,14 +23,14 @@ class SetPrefixCommand extends Command {
     let server = ds.servers[message.guild.id];
 
     if (!args.prefix) {
-      return sendmessage(message.channel, `Error: Missing argument: \`prefix\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`prefix\`. Use fcfs!help for commands.`);
     }
     
     server.prefix = args.prefix;
     
     this.client.datasource.saveServer(message.guild.id);
 
-    return sendmessage(message.channel, 'Success!');
+    return sendmessage(message.channel, `Successfully changed prefix to ${args.prefix}`);
   }
 }
 

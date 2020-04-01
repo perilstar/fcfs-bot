@@ -31,18 +31,18 @@ class CheckPositionCommand extends Command {
     let voiceState = member.voice;
 
     if (!voiceState.channelID) {
-      return sendmessage(message.channel, `Error: \`${member.displayName}\` is not in a voice channel`);
+      return sendmessage(message.channel, `Error: ${member.displayName} is not in a voice channel`);
     }
 
     let channelMonitor = server.channelMonitors[voiceState.channelID];
 
     if (!channelMonitor) {
-      return sendmessage(message.channel, `Error: \`${member.displayName}\` is not in a monitored channel`);
+      return sendmessage(message.channel, `Error: ${member.displayName} is not in a monitored channel`);
     }
 
     let position = channelMonitor.queue.findIndex(user => user.id == member.id) + 1;
 
-    return sendmessage(message.channel, `\`${member.displayName}\`'s position in \`${channelMonitor.name}\`: ${position}`)
+    return sendmessage(message.channel, `${member.displayName}'s position in ${channelMonitor.name}: ${position}`)
   }
 }
 

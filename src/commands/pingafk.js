@@ -19,7 +19,7 @@ class PingAfkCommand extends Command {
 
   async exec(message, args) {
     if (!args.member) {
-      return sendmessage(message.channel, `Error: Missing argument: \`member\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`member\`. Use fcfs!help for commands.`);
     }
 
     let ds = this.client.datasource;
@@ -29,13 +29,13 @@ class PingAfkCommand extends Command {
     let voiceState = args.member.voice;
 
     if (!voiceState.channelID) {
-      return sendmessage(message.channel, `Error: \`${args.member.displayName}\` is not in a voice channel`);
+      return sendmessage(message.channel, `Error: \`${args.member.displayName} is not in a voice channel`);
     }
 
     let channelMonitor = server.channelMonitors[voiceState.channelID];
 
     if (!channelMonitor) {
-      return sendmessage(message.channel, `Error: \`${args.member.displayName}\` is not in a monitored channel`);
+      return sendmessage(message.channel, `Error: \`${args.member.displayName} is not in a monitored channel`);
     }
 
     if (channelMonitor.restrictedMode) {

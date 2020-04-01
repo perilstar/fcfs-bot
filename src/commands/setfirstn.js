@@ -12,7 +12,7 @@ class SetFirstNCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'string'
+          type: 'voiceChannel'
         },
         {
           id: 'firstN',
@@ -24,10 +24,10 @@ class SetFirstNCommand extends Command {
 
   async exec(message, args) {
     if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing argument: \`monitorChannel\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
     if (!args.firstN) {
-      return sendmessage(message.channel, `Error: Missing argument: \`firstN\`. Use fcfs!help for commands.`);
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`firstN\`. Use fcfs!help for commands.`);
     }
 
     if (args.firstN < 1 || args.firstN > 25) {
@@ -37,13 +37,11 @@ class SetFirstNCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let monitorChannel = message.guild.channels.cache.find(channel => channel.name.toLowerCase() === args.monitorChannel.toLowerCase());
-
-    if (!server.channelMonitors[monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: couldn't find a channel called \`${args.monitorChannel}\` that's being monitored!`);
+    if (!server.channelMonitors[args.monitorChannel.id]) {
+      return sendmessage(message.channel, `Error: couldn't find a channel called ${args.monitorChannel} that's being monitored!`);
     }
 
-    let channelMonitor = server.channelMonitors[monitorChannel.id]
+    let channelMonitor = server.channelMonitors[args.monitorChannel.id]
 
     if (!channelMonitor.initialised) {
       await channelMonitor.init();
@@ -53,7 +51,7 @@ class SetFirstNCommand extends Command {
     channelMonitor.updateDisplay();
     ds.saveMonitor(channelMonitor.id);
 
-    return sendmessage(message.channel, 'Successfully changed!');
+    return sendmessage(message.channel, `Successfully changed queue max length for ${channelMonitor.name} to ${args.firstN}!`);
   }
 }
 
