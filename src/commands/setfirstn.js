@@ -51,7 +51,7 @@ class SetFirstNCommand extends Command {
     channelMonitor.updateDisplay();
     ds.saveMonitor(channelMonitor.id);
 
-    return sendmessage(message.channel, `Successfully changed queue max length for ${channelMonitor.name} to ${args.firstN}!`);
+    return sendmessage(message.channel, `Successfully changed queue max display length for ${channelMonitor.name} to ${args.firstN}!`);
   }
 }
 
