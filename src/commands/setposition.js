@@ -37,13 +37,13 @@ class SetPositionCommand extends Command {
     let voiceState = args.member.voice;
 
     if (!voiceState.channelID) {
-      return sendmessage(message.channel, `Error: \`${args.member.displayName} is not in a voice channel`);
+      return sendmessage(message.channel, `Error: ${args.member.displayName} is not in a voice channel`);
     }
 
     let channelMonitor = server.channelMonitors[voiceState.channelID];
 
     if (!channelMonitor) {
-      return sendmessage(message.channel, `Error: \`${args.member.displayName} is not in a monitored channel`);
+      return sendmessage(message.channel, `Error: ${args.member.displayName} is not in a monitored channel`);
     }
 
     let position = args.position - 1;
