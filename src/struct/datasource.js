@@ -105,11 +105,11 @@ class DataSource extends EventEmitter {
         for (let monitorID in server.channelMonitors) {
           let channelMonitor = server.channelMonitors[monitorID];
 
-          let a = !guild.channels.resolve(monitorID);
-          let b = !guild.channels.resolve(channelMonitor.displayChannel);
-          let c = !(await guild.channels.resolve(channelMonitor.displayChannel).messages.fetch(channelMonitor.displayMessage));
+          let a = guild.channels.resolve(monitorID).deleted;
+          let b = guild.channels.resolve(channelMonitor.displayChannel).deleted;
+          let c = (await guild.channels.resolve(channelMonitor.displayChannel).messages.fetch(channelMonitor.displayMessage)).deleted;
 
-          if (a || b || c || a.deleted || b.deleted) {
+          if (a || b || c ||) {
             this.removeMonitor(id, monitorID);
           }
           channelMonitor.modRoles = channelMonitor.modRoles.filter(roleID => availableRoles.includes(roleID));
