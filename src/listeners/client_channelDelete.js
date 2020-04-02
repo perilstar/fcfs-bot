@@ -33,7 +33,7 @@ class ChannelDeleteListener extends Listener {
 
     if (channel.type == 'text') {
       for (let snowflake in server.channelMonitors) {
-        if (server.channelMonitors[snowflake].guildID = channel.guild.id) {
+        if (server.channelMonitors[snowflake].displayChannel = channel.id) {
           ds.removeMonitor(server.id, snowflake);
         }
       }
