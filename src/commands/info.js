@@ -26,7 +26,7 @@ class InfoCommand extends Command {
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: couldn't find a channel called ${args.monitorChannel} that's being monitored!`);
+      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
     }
 
     let channelMonitor = server.channelMonitors[args.monitorChannel.id];
