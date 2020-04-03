@@ -87,6 +87,11 @@ class ChannelMonitor {
   }
 
   timeoutRemoveUserFromQueue(userID) {
+    let removeIndex = this.queue.findIndex(el => el.id == userID);
+    if (removeIndex == -1) {
+      console.log('tried to remove a user that wasn\'t in queue');
+      return;
+    }
     this.removalTimers[userID] = setTimeout(() => this.removeUserFromQueue(userID), this.rejoinWindow);
   }
 
