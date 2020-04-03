@@ -73,6 +73,7 @@ class PingAfkCommand extends Command {
         })
         .catch(collected => {
           voiceState.kick();
+          channelMonitor.removeUserFromQueue(args.member.id)
           resultsMessage.edit('User is AFK. Removing them from the queue.').catch(() => {});
           msg.reply('You failed to react to the message in time. You have been removed from the queue.');
         });
