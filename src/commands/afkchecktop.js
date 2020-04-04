@@ -67,7 +67,7 @@ class AfkCheckTopCommand extends Command {
       if (notInVC) text += `${notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
       if (notAFK) text += `${notAFK} member(s) reacted to the message in time\n`;
       if (afk) text += `${afk} member(s) were booted from the queue\n`;
-
+      // if this doesn't show up something big bad
       message.edit(text).catch(() => {});
     }
 
