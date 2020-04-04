@@ -55,9 +55,9 @@ class AfkCheckTopCommand extends Command {
 
     const update = (message) => {
       let text = `Mass AFK-checking...\n\n`;
-      if (notInVC) text += `${notInVC} member(s) were not actually in the voice channel and were skipped over`;
-      if (notAFK) text += `${notAFK} member(s) reacted to the message in time`;
-      if (afk) text += `${afk} member(s) were booted from the queue`;
+      if (notInVC) text += `${notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
+      if (notAFK) text += `${notAFK} member(s) reacted to the message in time\n`;
+      if (afk) text += `${afk} member(s) were booted from the queue\n`;
 
       message.edit(text).catch(() => {});
     }
@@ -67,7 +67,7 @@ class AfkCheckTopCommand extends Command {
       if (notInVC) text += `${notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
       if (notAFK) text += `${notAFK} member(s) reacted to the message in time\n`;
       if (afk) text += `${afk} member(s) were booted from the queue\n`;
-      // if this doesn't show up something big bad
+
       message.edit(text).catch(() => {});
     }
 
@@ -76,6 +76,7 @@ class AfkCheckTopCommand extends Command {
     let updateInterval = setInterval(() => update(resultsMessage), 10000);
 
     actuallyInVC.forEach(member => {
+      console.log(member.name);
       member.send(mentionMessage).then(msg => {
         msg.react('👍');
   
