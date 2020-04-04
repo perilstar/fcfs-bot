@@ -1,18 +1,16 @@
 const { Command } = require('discord-akairo');
-const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
-class DeleteWaitingRoomCommand extends Command {
+class QueueLengthCommand extends Command {
   constructor() {
-    super('deletewaitingroom', {
-      aliases: ['deletewaitingroom', 'dwr'],
+    super('queuelength', {
+      aliases: ['queuelength', 'ql'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: (message) => mps_admin(this.client, message),
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel',
+          type: 'voiceChannel'
         }
       ]
     });
@@ -30,10 +28,14 @@ class DeleteWaitingRoomCommand extends Command {
       return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
     }
 
-    ds.removeMonitor(message.guild.id, monitorChannel.id);
+    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
 
-    return sendmessage(message.channel, 'Successfully deleted!');
+    if (!channelMonitor.initialised) {
+      await channelMonitor.init();
+    }
+
+    return sendmessage(message.channel, `${channelMonitor.name} has ${channelMonitor.queue.length} people in it.`);
   }
 }
 
-module.exports = DeleteWaitingRoomCommand;
+module.exports = QueueLengthCommand;

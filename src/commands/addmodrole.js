@@ -1,5 +1,4 @@
 const { Command } = require('discord-akairo');
-const mps = require('../util/missingpermissionsupplier');
 const sendmessage = require('../util/sendmessage');
 
 class AddModRoleCommand extends Command {
@@ -8,12 +7,8 @@ class AddModRoleCommand extends Command {
       aliases: ['addmodrole', 'add-modrole', 'amr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: (message) => mps(this.client, message),
+      userPermissions: ['ADMINISTRATOR'],
       args: [
-        {
-          id: 'monitorChannel',
-          type: 'voiceChannel'
-        },
         {
           id: 'role',
           type: 'role'
@@ -23,10 +18,6 @@ class AddModRoleCommand extends Command {
   }
 
   async exec(message, args) {
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-
     if (!args.role) {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`role\`. Use fcfs!help for commands.`);
     }
@@ -34,30 +25,20 @@ class AddModRoleCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
-    }
-
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id]
-
-    if (!channelMonitor.initialised) {
-      await channelMonitor.init();
-    }
-
-    let modRoles = channelMonitor.modRoles;
+    let modRoles = server.modRoles;
 
     if (modRoles.length >= 10) {
-      return sendmessage(message.channel, `Error: You can not add more than 10 mod roles per waiting room!`);
+      return sendmessage(message.channel, `Error: You can not add more than 10 roles as bot mod!`);
     }
 
     if (modRoles.includes(args.role.id)) {
-      return sendmessage(message.channel, `Error: ${args.role.name} is already a mod for ${channelMonitor.name}!`);
+      return sendmessage(message.channel, `Error: ${args.role.name} is already set as bot mod!`);
     }
 
-    channelMonitor.modRoles.push(args.role.id);
-    ds.saveMonitor(channelMonitor.id);
+    server.modRoles.push(args.role.id);
+    ds.saveServer(server.id);
 
-    return sendmessage(message.channel, `Successfully added ${args.role.name} as a mod for ${channelMonitor.name}!`);
+    return sendmessage(message.channel, `Successfully added role ${args.role.name} as a bot mod!`);
   }
 }
 

@@ -1,13 +1,14 @@
 const { Command } = require('discord-akairo');
-const mps = require('../util/missingpermissionsupplier');
+const mps_helper = require('../util/mps_helper');
 const sendmessage = require('../util/sendmessage');
 
-class PingAfkCommand extends Command {
+class AfkCheckCommand extends Command {
   constructor() {
-    super('pingafk', {
-      aliases: ['pingafk', 'afk', 'afkcheck'],
+    super('afkcheck', {
+      aliases: ['afkcheck', 'afk'],
       split: 'quoted',
       channel: 'guild',
+      userPermissions: message => mps_helper(this.client, message),
       args: [
         {
           id: 'member',
@@ -24,7 +25,6 @@ class PingAfkCommand extends Command {
 
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
-    let guild = this.client.guilds.resolve(message.guild.id);
 
     let voiceState = args.member.voice;
 
@@ -36,14 +36,6 @@ class PingAfkCommand extends Command {
 
     if (!channelMonitor) {
       return sendmessage(message.channel, `Error: ${args.member.displayName} is not in a monitored channel`);
-    }
-
-    if (channelMonitor.restrictedMode) {
-      let sender = message.author;
-      let senderMember = guild.members.resolve(sender.id);
-      if (mps(this.client, message) && !senderMember.roles.cache.some(role => channelMonitor.modRoles.includes(role.id))) {
-        return sendmessage(message.channel, 'That user is in a channel which is in Restricted Mode, and you aren\'t a mod for it or a bot admin!');
-      }
     }
 
     if ((Date.now() - channelMonitor.lastAfkChecked[args.member.id]) < 10000) {
@@ -81,4 +73,4 @@ class PingAfkCommand extends Command {
   }
 }
 
-module.exports = PingAfkCommand;
+module.exports = AfkCheckCommand;

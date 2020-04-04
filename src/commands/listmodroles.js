@@ -1,10 +1,10 @@
 const { Command } = require('discord-akairo');
 const sendmessage = require('../util/sendmessage');
 
-class ListAdminRolesCommand extends Command {
+class ListModRolesCommand extends Command {
   constructor() {
-    super('listadminroles', {
-      aliases: ['listadminroles', 'lar'],
+    super('listmodroles', {
+      aliases: ['listmodroles', 'lmr'],
       split: 'quoted',
       channel: 'guild',
       userPermissions: ['ADMINISTRATOR']
@@ -15,12 +15,12 @@ class ListAdminRolesCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let adminRoles = server.adminRoles
+    let modRoles = server.modRoles
 
     let lines = [];
 
-    if (adminRoles.length) {
-      lines = lines.concat(adminRoles.map(roleID => {
+    if (modRoles.length) {
+      lines = lines.concat(modRoles.map(roleID => {
         let role = message.guild.roles.resolve(roleID);
         return `${role.name} (ID ${roleID})`;
       }))
@@ -34,4 +34,4 @@ class ListAdminRolesCommand extends Command {
   }
 }
 
-module.exports = ListAdminRolesCommand;
+module.exports = ListModRolesCommand;

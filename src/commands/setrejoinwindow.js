@@ -1,6 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
-const mps = require('../util/missingpermissionsupplier');
+const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
 class SetRejoinWindowCommand extends Command {
@@ -9,7 +9,7 @@ class SetRejoinWindowCommand extends Command {
       aliases: ['setrejoinwindow', 'set-rejoinwindow', 'set-rejoin-window', 'srw'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: (message) => mps(this.client, message),
+      userPermissions: (message) => mps_admin(this.client, message),
       args: [
         {
           id: 'monitorChannel',
@@ -41,8 +41,9 @@ class SetRejoinWindowCommand extends Command {
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: couldn't find a channel called ${args.monitorChannel} that's being monitored!`);
+      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
     }
+    
 
     let channelMonitor = server.channelMonitors[args.monitorChannel.id]
 

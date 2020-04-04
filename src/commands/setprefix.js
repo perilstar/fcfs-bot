@@ -1,5 +1,5 @@
 const { Command } = require('discord-akairo');
-const mps = require('../util/missingpermissionsupplier');
+const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
 class SetPrefixCommand extends Command {
@@ -8,7 +8,7 @@ class SetPrefixCommand extends Command {
       aliases: ['setprefix', 'set-prefix', 'prefix'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: (message) => mps(this.client, message),
+      userPermissions: (message) => mps_admin(this.client, message),
       args: [
         {
           id: 'prefix',

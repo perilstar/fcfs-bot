@@ -1,12 +1,10 @@
 const sqlite = require('sqlite')
-const EventEmitter = require('events');
 const Server = require('./server');
 const fs = require('fs');
+const dbupdate = require('../util/dbupdate');
 
-class DataSource extends EventEmitter {
+class DataSource {
   constructor(client) {
-    super();
-
     this.client = client;
     this.servers = {};
     
@@ -31,24 +29,31 @@ class DataSource extends EventEmitter {
 
     let db = await sqlite.open('./db/fcfs.db');
 
+    let tableExists = db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='server'`);
+    if (!tableExists) {
+      await db.run(`PRAGMA user_version = 2`);
+    }
+
     await db.run(`CREATE TABLE IF NOT EXISTS monitor (
-      id TEXT PRIMARY KEY,
-      guild_id TEXT,
-      display_channel TEXT,
-      display_message TEXT,
-      first_n INTEGER,
-      rejoin_window INTEGER,
-      afk_check_duration INTEGER,
-      restricted_mode INTEGER,
-      mod_roles TEXT,
-      queue TEXT
+      id TEXT PRIMARY KEY ,
+      guild_id TEXT ,
+      display_channel TEXT ,
+      display_message TEXT ,
+      display_size INTEGER ,
+      rejoin_window INTEGER ,
+      afk_check_duration INTEGER ,
+      queue TEXT 
     )`);
 
     await db.run(`CREATE TABLE IF NOT EXISTS server (
-      id TEXT PRIMARY KEY,
-      bot_prefix TEXT,
-      admin_roles TEXT
+      id TEXT PRIMARY KEY ,
+      bot_prefix TEXT ,
+      admin_roles TEXT ,
+      mod_roles TEXT ,
+      helper_roles TEXT  
     )`);
+
+    await dbupdate(db);
 
     await sqlite.close(db)
   }
@@ -61,8 +66,11 @@ class DataSource extends EventEmitter {
     let result = await db.all(sql, []);
     
     for (let row of result) {
-      let adminRoles = row.admin_roles.split(',').filter(Boolean);
-      this.addServer(row.id, row.bot_prefix, adminRoles);
+      let adminRoles = (row.admin_roles || '').split(',').filter(Boolean);
+      let modRoles = (row.mod_roles || '').split(',').filter(Boolean);
+      let helperRoles = (row.helper_roles || '').split(',').filter(Boolean);
+
+      this.addServer(row.id, row.bot_prefix, adminRoles, modRoles, helperRoles);
     }
 
     sql = `SELECT * FROM monitor`
@@ -74,15 +82,13 @@ class DataSource extends EventEmitter {
         guildID: row.guild_id,
         displayChannel: row.display_channel,
         displayMessage: row.display_message,
-        firstN: row.first_n,
+        displaySize: row.display_size,
         rejoinWindow: row.rejoin_window,
         afkCheckDuration: row.afk_check_duration,
-        restrictedMode: row.restricted_mode === 1,
-        modRoles: row.mod_roles.split(',').filter(Boolean),
         snowflakeQueue: row.queue.split(',').filter(Boolean)
       }
       if (!this.servers[row.guild_id]) {
-        this.addServer(row.guild_id, 'fcfs!', []);
+        this.addServer(row.guild_id, 'fcfs!', [], [], []);
         this.saveServerSnowflakes.push(row.guild_id);
       }
       this.servers[row.guild_id].addChannelMonitor(data);
@@ -112,7 +118,6 @@ class DataSource extends EventEmitter {
           if (!a || !b || !c || a.deleted || b.deleted || c.deleted) {
             this.removeMonitor(id, monitorID);
           }
-          channelMonitor.modRoles = channelMonitor.modRoles.filter(roleID => availableRoles.includes(roleID));
           this.saveMonitorSnowflakes.push(monitorID);
         }
       }
@@ -123,7 +128,7 @@ class DataSource extends EventEmitter {
     let currentlyInGuilds = this.client.guilds.cache.keyArray();
     for (let snowflake of currentlyInGuilds) {
       if (!this.servers[snowflake]) {
-        this.addServer(snowflake, 'fcfs!', []);
+        this.addServer(snowflake, 'fcfs!', [], [], []);
         this.saveServerSnowflakes.push(snowflake);
       }
     }
@@ -174,27 +179,31 @@ class DataSource extends EventEmitter {
       let v = [
         server.id,
         server.prefix,
-        server.adminRoles.join(',')
+        (server.adminRoles || []).join(','),
+        (server.modRoles || []).join(','),
+        (server.helperRoles || []).join(',')
       ];
     
-      placeholders.push('(?, ?, ?)');
+      placeholders.push('(?, ?, ?, ?, ?)');
       values = values.concat(v);
     }
 
     this.saveServerSnowflakes = [];
 
-    let sql = `INSERT INTO server (id, bot_prefix, admin_roles)
+    let sql = `INSERT INTO server (id, bot_prefix, admin_roles, mod_roles, helper_roles)
     VALUES ${placeholders.join(', ')}
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
     bot_prefix = excluded.bot_prefix,
-    admin_roles = excluded.admin_roles`;
+    admin_roles = excluded.admin_roles,
+    mod_roles = excluded.mod_roles,
+    helper_roles = excluded.helper_roles`;
     
     await db.run(sql, values);
   }
 
-  addServer(snowflake, prefix = 'fcfs!', adminRoles) {
-    this.servers[snowflake] = new Server(this.client, snowflake, prefix, adminRoles);
+  addServer(snowflake, prefix = 'fcfs!', adminRoles, modRoles, helperRoles) {
+    this.servers[snowflake] = new Server(this.client, snowflake, prefix, adminRoles, modRoles, helperRoles);
   }
 
   removeServer(snowflake) {
@@ -276,15 +285,13 @@ class DataSource extends EventEmitter {
         monitor.guildID,
         monitor.displayChannel,
         monitor.displayMessage,
-        monitor.firstN,
+        monitor.displaySize,
         monitor.rejoinWindow,
         monitor.afkCheckDuration,
-        monitor.restrictedMode ? 1 : 0,
-        monitor.modRoles.join(','),
         monitor.queue.map(member => member.id).join(',')
       ];
 
-      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?)');
       values = values.concat(v);
     }
 
@@ -292,18 +299,16 @@ class DataSource extends EventEmitter {
 
 
     let sql = `INSERT INTO monitor (id, guild_id, display_channel, display_message,
-      first_n, rejoin_window, afk_check_duration, restricted_mode, mod_roles, queue)
+      display_size, rejoin_window, afk_check_duration, queue)
     VALUES ${placeholders.join(', ')}
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
     guild_id = excluded.guild_id,
     display_channel = excluded.display_channel,
     display_message = excluded.display_message,
-    first_n = excluded.first_n,
+    display_size = excluded.display_size,
     rejoin_window = excluded.rejoin_window,
     afk_check_duration = excluded.afk_check_duration,
-    restricted_mode = excluded.restricted_mode,
-    mod_roles = excluded.mod_roles,
     queue = excluded.queue`;
 
     await db.run(sql, values);
