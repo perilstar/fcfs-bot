@@ -101,7 +101,7 @@ class DataSource {
     for (let id in this.servers) {
       let server = this.servers[id];
       let guild = this.client.guilds.resolve(id);
-      if (!guild) {
+      if (!guild || guild.deleted) {
         this.removeServer(id);
       } else if (guild.available) {
         let availableRoles = this.client.guilds.resolve(id).roles.cache.keyArray();
@@ -208,6 +208,7 @@ class DataSource {
 
   removeServer(snowflake) {
     this.removeServerSnowflakes.push(snowflake);
+    delete this.servers[snowflake];
 
     this.timeoutSave();
   }
@@ -218,11 +219,13 @@ class DataSource {
     let placeholders = this.removeServerSnowflakes.map(el => '?');
 
     let sql = `DELETE FROM server
-    WHERE id IN (${placeholders.join(', ')});
-    DELETE FROM monitor
+    WHERE id IN (${placeholders.join(', ')})`;
+
+    let sql2 = `DELETE FROM monitor
     WHERE guild_id IN (${placeholders.join(', ')})`;
 
-    await db.run(sql, this.removeServerSnowflakes.concat(this.removeServerSnowflakes));
+    await db.run(sql, this.removeServerSnowflakes);
+    await db.run(sql2, this.removeServerSnowflakes);
 
     this.removeServerSnowflakes.forEach(snowflake => delete this.servers[snowflake]);
 
