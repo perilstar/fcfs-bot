@@ -1,13 +1,15 @@
 const ChannelMonitor = require('./channel_monitor');
 
 class Server {
-  constructor(client, id, prefix, adminRoles) {
+  constructor(client, id, prefix, adminRoles, modRoles, helperRoles) {
     this.client = client;
     this.id = id;
     this.prefix = prefix;
 
     this.channelMonitors = {};
     this.adminRoles = adminRoles;
+    this.modRoles = modRoles;
+    this.helperRoles = helperRoles;
   }
 
   addChannelMonitor(data) {

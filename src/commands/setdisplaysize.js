@@ -1,12 +1,11 @@
 const { Command } = require('discord-akairo');
-const parseDuration = require('parse-duration');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
-class SetAfkCheckDurationCommand extends Command {
+class SetDisplaySizeCommand extends Command {
   constructor() {
-    super('setafkcheckduration', {
-      aliases: ['setafkcheckduration', 'set-afkcheckduration', 'set-afk-check-duration', 'sacd'],
+    super('setdisplaysize', {
+      aliases: ['setdisplaysize', 'set-displaysize', 'set-display-size', 'sds'],
       split: 'quoted',
       channel: 'guild',
       userPermissions: (message) => mps_admin(this.client, message),
@@ -16,8 +15,8 @@ class SetAfkCheckDurationCommand extends Command {
           type: 'voiceChannel'
         },
         {
-          id: 'afkCheckDuration',
-          type: 'string'
+          id: 'displaySize',
+          type: 'integer'
         }
       ]
     });
@@ -27,14 +26,12 @@ class SetAfkCheckDurationCommand extends Command {
     if (!args.monitorChannel) {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
-    if (!args.afkCheckDuration) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
+    if (!args.displaySize) {
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`displaySize\`. Use fcfs!help for commands.`);
     }
 
-    let afkCheckDuration = parseDuration(args.afkCheckDuration);
-
-    if (afkCheckDuration < 15000 || afkCheckDuration > 900000) {
-      return sendmessage(message.channel, 'Error: `afkCheckDuration` must be between 15 sec and 15 min');
+    if (args.displaySize < 1 || args.displaySize > 20) {
+      return sendmessage(message.channel, 'Error: `displaySize` must be between 1 and 20');
     }
 
     let ds = this.client.datasource;
@@ -50,11 +47,12 @@ class SetAfkCheckDurationCommand extends Command {
       await channelMonitor.init();
     }
 
-    channelMonitor.afkCheckDuration = afkCheckDuration;
+    channelMonitor.displaySize = args.displaySize;
+    channelMonitor.updateDisplay();
     ds.saveMonitor(channelMonitor.id);
 
-    return sendmessage(message.channel, `Successfully changed AFK check duration for ${channelMonitor.name} to ${afkCheckDuration}ms!`);
+    return sendmessage(message.channel, `Successfully changed queue max display length for ${channelMonitor.name} to ${args.displaySize}!`);
   }
 }
 
-module.exports = SetAfkCheckDurationCommand;
+module.exports = SetDisplaySizeCommand;

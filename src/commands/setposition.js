@@ -1,13 +1,13 @@
 const { Command } = require('discord-akairo');
 const sendmessage = require('../util/sendmessage');
-const mps = require('../util/missingpermissionsupplier');
+const mps_mod = require('../util/mps_mod');
 
 class SetPositionCommand extends Command {
   constructor() {
     super('setposition', {
       aliases: ['setposition', 'sp'],
       split: 'quoted',
-      userPermissions: (message) => mps(this.client, message),
+      userPermissions: (message) => mps_mod(this.client, message),
       channel: 'guild',
       args: [
         {

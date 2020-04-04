@@ -1,10 +1,10 @@
 const { Command } = require('discord-akairo');
 const sendmessage = require('../util/sendmessage');
 
-class RemoveModRoleCommand extends Command {
+class RemoveHelperRoleCommand extends Command {
   constructor() {
-    super('removemodrole', {
-      aliases: ['removemodrole', 'remove-modrole', 'rmr'],
+    super('removehelperrole', {
+      aliases: ['removehelperrole', 'remove-helperrole', 'rhr'],
       split: 'quoted',
       channel: 'guild',
       userPermissions: ['ADMINISTRATOR'],
@@ -25,18 +25,18 @@ class RemoveModRoleCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let modRoles = server.modRoles;
+    let helperRoles = server.helperRoles;
 
-    if (!modRoles.includes(args.role.id)) {
-      return sendmessage(message.channel, `Error: ${args.role.name} is not set as bot mod!`);
+    if (!helperRoles.includes(args.role.id)) {
+      return sendmessage(message.channel, `Error: ${args.role.name} is not set as bot helper!`);
     }
 
-    let index = server.modRoles.indexOf(args.role.id);
-    server.modRoles.splice(index, 1);
+    let index = server.helperRoles.indexOf(args.role.id);
+    server.helperRoles.splice(index, 1);
     ds.saveServer(server.id);
 
-    return sendmessage(message.channel, `Successfully removed role ${args.role.name} as bot mod!`);
+    return sendmessage(message.channel, `Successfully removed role ${args.role.name} as bot helper!`);
   }
 }
 
-module.exports = RemoveModRoleCommand;
+module.exports = RemoveHelperRoleCommand;

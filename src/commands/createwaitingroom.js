@@ -1,6 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
-const mps = require('../util/missingpermissionsupplier');
+const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
 class CreateWaitingRoomCommand extends Command {
@@ -9,14 +9,14 @@ class CreateWaitingRoomCommand extends Command {
       aliases: ['createwaitingroom', 'cwr'],
       split: 'quoted',
       channel: 'guild',
-      userPermissions: (message) => mps(this.client, message),
+      userPermissions: (message) => mps_admin(this.client, message),
       args: [
         {
           id: 'monitorChannel',
           type: 'voiceChannel',
         },
         {
-          id: 'firstN',
+          id: 'displaySize',
           type: 'integer'
         },
         {
@@ -38,8 +38,8 @@ class CreateWaitingRoomCommand extends Command {
     if (!args.monitorChannel) {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
-    if (!args.firstN) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`firstN\`. Use fcfs!help for commands.`);
+    if (!args.displaySize) {
+      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`displaySize\`. Use fcfs!help for commands.`);
     }
     if (!args.rejoinWindow) {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
@@ -49,14 +49,14 @@ class CreateWaitingRoomCommand extends Command {
     }
 
     if (server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: channel ${args.monitorChannel} is already being monitored!`);
+      return sendmessage(message.channel, `Error: channel ${args.monitorChannel.name} is already being monitored!`);
     }
 
     let rejoinWindow = parseDuration(args.rejoinWindow);
     let afkCheckDuration = parseDuration(args.afkCheckDuration);
 
-    if (args.firstN < 1 || args.firstN > 25) {
-      return sendmessage(message.channel, 'Error: `firstN` must be between 1 and 25');
+    if (args.displaySize < 1 || args.displaySize > 20) {
+      return sendmessage(message.channel, 'Error: `displaySize` must be between 1 and 20');
     }
 
     if (rejoinWindow < 0 || rejoinWindow > 600000) {
@@ -76,11 +76,9 @@ class CreateWaitingRoomCommand extends Command {
       id: args.monitorChannel.id,
       displayChannel: displayChannel.id,
       displayMessage: displayMessage.id,
-      firstN: args.firstN,
+      displaySize: args.displaySize,
       rejoinWindow: rejoinWindow,
       afkCheckDuration: afkCheckDuration,
-      restrictedMode: true,
-      modRoles: [],
       snowflakeQueue: []
     }
 

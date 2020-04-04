@@ -1,4 +1,4 @@
-const { VoiceChannel } = require('discord.js');
+const { Util } = require('discord.js');
 
 class ChannelMonitor {
   constructor(client, data) {
@@ -11,10 +11,8 @@ class ChannelMonitor {
     this.displayMessage = data.displayMessage;
 
     this.rejoinWindow = data.rejoinWindow;
-    this.firstN = data.firstN;
+    this.displaySize = data.displaySize;
     this.afkCheckDuration = data.afkCheckDuration;
-    this.restrictedMode = data.restrictedMode;
-    this.modRoles = data.modRoles;
 
     this.lastAfkChecked = {};
     this.removalTimers = {};
@@ -88,16 +86,15 @@ class ChannelMonitor {
   }
 
   timeoutRemoveUserFromQueue(userID) {
+    let removeIndex = this.queue.findIndex(el => el.id == userID);
+    if (removeIndex == -1) return;
     this.removalTimers[userID] = setTimeout(() => this.removeUserFromQueue(userID), this.rejoinWindow);
   }
 
   async removeUserFromQueue(userID) {
     if (!this.initialised) await this.init();
     let removeIndex = this.queue.findIndex(el => el.id == userID);
-    if (removeIndex == -1) {
-      console.log('tried to remove a user that wasn\'t in queue');
-      return;
-    }
+    if (removeIndex == -1) return;
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
     this.client.datasource.saveMonitor(this.id);
@@ -114,7 +111,7 @@ class ChannelMonitor {
     this.updateTimer = null;
     try {
       this.client.channels.resolve(this.displayChannel).messages.fetch(this.displayMessage).then(message => {
-        message.edit(this.message);
+        message.edit(Util.removeMentions(this.message));
       });
     } catch (err) {
       console.log(err);

@@ -1,5 +1,4 @@
 const { Command } = require('discord-akairo');
-const mps = require('../util/missingpermissionsupplier');
 const sendmessage = require('../util/sendmessage');
 
 class InfoCommand extends Command {
@@ -38,26 +37,10 @@ class InfoCommand extends Command {
     let lines = [
       `Monitoring: ${channelMonitor.name} (ID ${channelMonitor.id})`,
       `Display: #${channelMonitor.displayChannelName} (ID ${channelMonitor.displayChannel})`,
-      `Showing the first ${channelMonitor.firstN} people in the queue`,
+      `Showing the first ${channelMonitor.displaySize} people in the queue`,
       `Rejoin Window: ${channelMonitor.rejoinWindow}ms`,
       `AFK Check Duration: ${channelMonitor.afkCheckDuration}ms`,
-      `Channel is ${channelMonitor.restrictedMode? '' : 'not '}in Restricted Mode`
     ];
-
-    if (channelMonitor.restrictedMode) {
-      lines.push('Roles allowed to AFK Check:');
-    }
-
-    let modRoles = channelMonitor.modRoles;
-
-    if (modRoles.length) {
-      lines = lines.concat(modRoles.map(roleID => {
-        let role = message.guild.roles.resolve(roleID);
-        return `  ${role.name} (ID ${roleID})`;
-      }))
-    } else {
-      lines.push('  <NONE>');
-    }
 
     return sendmessage(message.channel, '**Waiting Room Info**\n```\n' + lines.join('\n') + '\n```');
   }

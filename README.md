@@ -18,8 +18,8 @@ Lists bot admin roles.
 `setprefix <prefix>`  
 Changes the bot prefix in this server.
 
-`(createwaitingroom|cwr) "<monitorChannel>" <firstN> <rejoinWindow> <afkCheckDuration>`  
-Creates a monitor for the channel specified by `monitorChannel` that displays the first `firstN` users in the queue, allowing them `rejoinWindow` of time being disconnected before they\'re removed from the queue, and giving them `afkCheckDuration` to react to AFK Checks.
+`(createwaitingroom|cwr) "<monitorChannel>" <displaySize> <rejoinWindow> <afkCheckDuration>`  
+Creates a monitor for the channel specified by `monitorChannel` that displays the first `displaySize` users in the queue, allowing them `rejoinWindow` of time being disconnected before they\'re removed from the queue, and giving them `afkCheckDuration` to react to AFK Checks.
 Example: `fcfs!cwr "Waiting Room 1" 10 5s 20s`
 
 `(listwaitingrooms|lwr) [page]`  
@@ -52,7 +52,7 @@ Removes a mod role for `monitorChannel`.
 `(listmodroles|lmr) "<monitorChannel>"`
 Lists mod roles for `monitorChannel`.
 
-`(setfirstn|sfn) "<monitorChannel>" <firstN>`,  
+`(setfirstn|sfn) "<monitorChannel>" <displaySize>`,  
 `(setrejoinwindow|srw) "<monitorChannel>" <rejoinWindow>`,  
 `(setafkcheckduration|sacd) "<monitorChannel>" <afkCheckDuration>`  
 Changes settings for the waiting room associated with `monitorChannel`.

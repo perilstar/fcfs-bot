@@ -13,6 +13,12 @@ class MissingPermissionsListener extends Listener {
     if (missing == 'botAdmin') {
       return sendmessage(message.channel, 'Missing permissions to do this! Are you a bot admin?')
     }
+    if (missing == 'botMod') {
+      return sendmessage(message.channel, 'Missing permissions to do this! Are you a bot mod or higher?')
+    }
+    if (missing == 'botHelper') {
+      return sendmessage(message.channel, 'Missing permissions to do this! Are you a bot helper or higher?')
+    }
     if (type == 'user') {
       return sendmessage(message.channel, 'Missing permissions to do this! Are you an Administrator?');
     }
