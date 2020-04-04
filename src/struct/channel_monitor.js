@@ -67,7 +67,7 @@ class ChannelMonitor {
     let guild = this.client.guilds.resolve(this.guildID);
 
     let title = `**${this.name} Queue:**`;
-    let top = this.queue.slice(0, this.displaySize).map(user => `${guild.members.cache.get(user.id).displayName} (${user.tag})`).join('\n');
+    let top = this.queue.slice(0, this.displaySize).map((user, index) => `${index + 1}. ${guild.members.cache.get(user.id).displayName} (${user.tag})`).join('\n');
 
     return title + '\n```\n' + (top || '<EMPTY>') + '\n```';
   }
