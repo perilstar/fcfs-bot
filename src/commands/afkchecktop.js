@@ -76,7 +76,6 @@ class AfkCheckTopCommand extends Command {
     let updateInterval = setInterval(() => update(resultsMessage), 10000);
 
     actuallyInVC.forEach(member => {
-      console.log(member.displayName);
       member.send(mentionMessage).then(msg => {
         msg.react('👍');
   
