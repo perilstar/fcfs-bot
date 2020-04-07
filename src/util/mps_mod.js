@@ -11,4 +11,4 @@ module.exports = (client, message) => {
   }
 
   return 'botMod';
-}
+};

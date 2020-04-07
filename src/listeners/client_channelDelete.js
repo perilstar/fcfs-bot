@@ -18,7 +18,7 @@ class ChannelDeleteListener extends Listener {
   }
 
   async exec(channel) {
-    if (!channel instanceof GuildChannel) return;
+    if (!(channel instanceof GuildChannel)) return;
 
     let ds = this.client.datasource;
 

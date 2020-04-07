@@ -42,7 +42,7 @@ class CheckPositionCommand extends Command {
 
     let position = channelMonitor.queue.findIndex(user => user.id == member.id) + 1;
 
-    return sendmessage(message.channel, `${member.displayName}'s position in ${channelMonitor.name}: ${position}`)
+    return sendmessage(message.channel, `${member.displayName}'s position in ${channelMonitor.name}: ${position}`);
   }
 }
 

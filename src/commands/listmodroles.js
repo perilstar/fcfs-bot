@@ -15,7 +15,7 @@ class ListModRolesCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let modRoles = server.modRoles
+    let modRoles = server.modRoles;
 
     let lines = [];
 
@@ -23,7 +23,7 @@ class ListModRolesCommand extends Command {
       lines = lines.concat(modRoles.map(roleID => {
         let role = message.guild.roles.resolve(roleID);
         return `${role.name} (ID ${roleID})`;
-      }))
+      }));
     } else {
       lines.push('<NONE>');
     }

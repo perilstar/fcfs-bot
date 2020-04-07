@@ -80,7 +80,7 @@ class CreateWaitingRoomCommand extends Command {
       rejoinWindow: rejoinWindow,
       afkCheckDuration: afkCheckDuration,
       snowflakeQueue: []
-    }
+    };
 
     message.delete();
 

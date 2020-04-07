@@ -1,4 +1,4 @@
-const sqlite = require('sqlite')
+const sqlite = require('sqlite');
 const Server = require('./server');
 const fs = require('fs');
 const dbupdate = require('../util/dbupdate');
@@ -55,14 +55,14 @@ class DataSource {
 
     await dbupdate(db);
 
-    await sqlite.close(db)
+    await sqlite.close(db);
   }
 
   async load() {
 
     let db = await sqlite.open('./db/fcfs.db');
 
-    let sql = `SELECT * FROM server`
+    let sql = `SELECT * FROM server`;
     let result = await db.all(sql, []);
     
     for (let row of result) {
@@ -70,10 +70,10 @@ class DataSource {
       let modRoles = (row.mod_roles || '').split(',').filter(Boolean);
       let helperRoles = (row.helper_roles || '').split(',').filter(Boolean);
 
-      this.addServer(row.id, row.bot_prefix, adminRoles, modRoles, helperRoles);
+      this.addServer(row.id, row.bot_prefix || 'fcfs!', adminRoles, modRoles, helperRoles);
     }
 
-    sql = `SELECT * FROM monitor`
+    sql = `SELECT * FROM monitor`;
     result = await db.all(sql, []);
     
     for (let row of result) {
@@ -86,7 +86,7 @@ class DataSource {
         rejoinWindow: row.rejoin_window,
         afkCheckDuration: row.afk_check_duration,
         snowflakeQueue: row.queue.split(',').filter(Boolean)
-      }
+      };
       if (!this.servers[row.guild_id]) {
         this.addServer(row.guild_id, 'fcfs!', [], [], []);
         this.saveServerSnowflakes.push(row.guild_id);
@@ -94,7 +94,7 @@ class DataSource {
       this.servers[row.guild_id].addChannelMonitor(data);
     }
 
-    await sqlite.close(db)
+    await sqlite.close(db);
   }
 
   async cleanupDeleted() {
@@ -105,7 +105,7 @@ class DataSource {
         this.removeServer(id);
       } else if (guild.available) {
         let availableRoles = this.client.guilds.resolve(id).roles.cache.keyArray();
-        this.servers[id].adminRoles = this.servers[id].adminRoles.filter(roleID => availableRoles.includes(roleID));
+        this.servers[id].adminRoles = this.servers[id].adminRoles.filter(roleID => availableRoles.includes(roleID)); // jshint ignore:line
         this.saveServerSnowflakes.push(id);
 
         for (let monitorID in server.channelMonitors) {
@@ -202,7 +202,7 @@ class DataSource {
     await db.run(sql, values);
   }
 
-  addServer(snowflake, prefix = 'fcfs!', adminRoles, modRoles, helperRoles) {
+  addServer(snowflake, prefix, adminRoles, modRoles, helperRoles) {
     this.servers[snowflake] = new Server(this.client, snowflake, prefix, adminRoles, modRoles, helperRoles);
   }
 

@@ -23,7 +23,7 @@ class RoleDeleteListener extends Listener {
     }
 
     for (let monitorID in server.channelMonitors) {
-      let channelMonitor = server.channelMonitors[monitorID]
+      let channelMonitor = server.channelMonitors[monitorID];
       let index = channelMonitor.modRoles.indexOf(role.id);
       if (index != -1) {
         channelMonitor.modRoles.splice(index, 1);

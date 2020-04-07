@@ -15,7 +15,7 @@ class ListHelperRolesCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let helperRoles = server.helperRoles
+    let helperRoles = server.helperRoles;
 
     let lines = [];
 
@@ -23,7 +23,7 @@ class ListHelperRolesCommand extends Command {
       lines = lines.concat(helperRoles.map(roleID => {
         let role = message.guild.roles.resolve(roleID);
         return `${role.name} (ID ${roleID})`;
-      }))
+      }));
     } else {
       lines.push('<NONE>');
     }

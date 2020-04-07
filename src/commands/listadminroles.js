@@ -15,7 +15,7 @@ class ListAdminRolesCommand extends Command {
     let ds = this.client.datasource;
     let server = ds.servers[message.guild.id];
 
-    let adminRoles = server.adminRoles
+    let adminRoles = server.adminRoles;
 
     let lines = [];
 
@@ -23,7 +23,7 @@ class ListAdminRolesCommand extends Command {
       lines = lines.concat(adminRoles.map(roleID => {
         let role = message.guild.roles.resolve(roleID);
         return `${role.name} (ID ${roleID})`;
-      }))
+      }));
     } else {
       lines.push('<NONE>');
     }

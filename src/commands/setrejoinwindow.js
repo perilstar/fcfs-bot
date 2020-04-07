@@ -45,7 +45,7 @@ class SetRejoinWindowCommand extends Command {
     }
     
 
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id]
+    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
 
     if (!channelMonitor.initialised) {
       await channelMonitor.init();

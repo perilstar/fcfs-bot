@@ -44,7 +44,7 @@ class SetAfkCheckDurationCommand extends Command {
       return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
     }
 
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id]
+    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
 
     if (!channelMonitor.initialised) {
       await channelMonitor.init();

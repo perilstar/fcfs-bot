@@ -9,4 +9,4 @@ module.exports = (client, message) => {
   }
 
   return 'botAdmin';
-}
+};

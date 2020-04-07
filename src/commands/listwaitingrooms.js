@@ -40,7 +40,7 @@ class ListWaitingRoomsCommand extends Command {
     let lines = [];
 
     for (let i = 0; i < monitoredNames.length; i++) {
-      lines.push(`'${monitoredNames[i]}' queue is displayed in '#${displayNames[i]}'`)
+      lines.push(`'${monitoredNames[i]}' queue is displayed in '#${displayNames[i]}'`);
     }
 
     let pages = Math.ceil(lines.length / 10);
@@ -48,7 +48,7 @@ class ListWaitingRoomsCommand extends Command {
     let currentPage = [];
 
     if (page > pages || page < 1) {
-      currentPage = ['<NONE>']
+      currentPage = ['<NONE>'];
     } else {
       currentPage = lines.slice((page - 1) * 10, 10);
     }

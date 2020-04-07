@@ -11,7 +11,7 @@ class MessageDeleteListener extends Listener {
 
   async exec(message) {
     let channel = message.channel;
-    if (!channel instanceof TextChannel) return;
+    if (!(channel instanceof TextChannel)) return;
 
     let ds = this.client.datasource;
 

@@ -60,7 +60,7 @@ class AfkCheckTopCommand extends Command {
       if (afk) text += `${afk} member(s) were booted from the queue\n`;
 
       message.edit(text).catch(() => {});
-    }
+    };
 
     const finalize = (message) => {
       let text = `Mass AFK-checking complete!\n\n`;
@@ -69,7 +69,7 @@ class AfkCheckTopCommand extends Command {
       if (afk) text += `${afk} member(s) were booted from the queue\n`;
 
       message.edit(text).catch(() => {});
-    }
+    };
 
     if (!actuallyInVC.length) return finalize(resultsMessage);
 
@@ -98,7 +98,7 @@ class AfkCheckTopCommand extends Command {
           })
           .catch(collected => {
             member.voice.kick();
-            channelMonitor.removeUserFromQueue(member.id)
+            channelMonitor.removeUserFromQueue(member.id);
             msg.reply('You failed to react to the message in time. You have been removed from the queue.');
             afk++;
             if (afk + notAFK >= actuallyInVC.length) {

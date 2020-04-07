@@ -14,7 +14,8 @@ class Server {
 
   addChannelMonitor(data) {
     let channelMonitor = new ChannelMonitor(this.client, data);
-    return this.channelMonitors[data.id] = channelMonitor;
+    this.channelMonitors[data.id] = channelMonitor;
+    return this.channelMonitors[data.id];
   }
 
   removeChannelMonitor(id) {
