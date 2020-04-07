@@ -84,7 +84,7 @@ class HelpCommand extends Command {
         *Aliases:* \`prefix\`
 
         \`createwaitingroom "<monitorChannel>" <displayCount> <rejoinWindow> <afkCheckDuration>\`
-        Creates a waiting room that displays the first displayCount members to join monitorChannel in the channel the command,
+        Creates a waiting room that displays the first displayCount members to join monitorChannel in the channel the command
         was typed in, with a grace period of rejoinWindow for accidental disconnects, and waiting afkCheckDuration to remove
         the user from queue when they're afk-checked.
         *Aliases:* \`cwr\`
