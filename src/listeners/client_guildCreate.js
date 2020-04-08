@@ -9,9 +9,9 @@ class GuildCreateListener extends Listener {
   }
 
   async exec(guild) {
-    if (!this.client.datasource.servers[guild.id]) {
-      this.client.datasource.addServer(guild.id, 'fcfs!', [], [], []);
-      this.client.datasource.saveServer(guild.id);
+    if (!this.client.dataSource.servers[guild.id]) {
+      this.client.dataSource.addServer(guild.id, 'fcfs!', [], [], []);
+      this.client.dataSource.saveServer(guild.id);
     }
   }
 }

@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const mps_helper = require('../util/mps_helper');
 const sendmessage = require('../util/sendmessage');
+const AFKChecker = require('../struct/afk_checker');
 
 class AfkCheckCommand extends Command {
   constructor() {
@@ -23,7 +24,7 @@ class AfkCheckCommand extends Command {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`member\`. Use fcfs!help for commands.`);
     }
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     let voiceState = args.member.voice;
@@ -38,38 +39,19 @@ class AfkCheckCommand extends Command {
       return sendmessage(message.channel, `Error: ${args.member.displayName} is not in a monitored channel`);
     }
 
-    if ((Date.now() - channelMonitor.lastAfkChecked[args.member.id]) < 10000) {
-      return sendmessage(message.channel, 'Please don\'t spam the AFK Check command on that user! (Think of the pings!)');
+    let resultsMessage = await sendmessage(message.channel, 'AFK Checking...');
+    let afkChecker = new AFKChecker(this.client, server, channelMonitor, [args.member]);
+    let results = await afkChecker.run();
+
+    if (results.recentlyChecked > 0) {
+      resultsMessage.edit('That user was recently AFK-Checked. Try again later.').catch(() => {});
+    } else if (results.afk > 0) {
+      resultsMessage.edit('User is AFK. Removing them from the queue.').catch(() => {});
+    } else if (results.notAFK > 0) {
+      resultsMessage.edit('User is not AFK. Keeping them in the queue.').catch(() => {});
     }
-    channelMonitor.lastAfkChecked[args.member.id] = Date.now() + channelMonitor.afkCheckDuration;
 
-    let resultsMessage = await message.channel.send('AFK-checking...');
-
-    let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
-    args.member.send(mentionMessage).then(msg => {
-      msg.react('👍');
-
-      const filter = (reaction, user) => {
-          return ['👍'].includes(reaction.emoji.name) && user.id === args.member.id;
-      };
-
-      msg.awaitReactions(filter, { max: 1, time: channelMonitor.afkCheckDuration, errors: ['time'] })
-        .then(collected => {
-            const reaction = collected.first();
-
-            if (reaction.emoji.name === '👍') {
-              msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
-              resultsMessage.edit('User is not AFK. Keeping them in the queue.').catch(() => {});
-              channelMonitor.lastAfkChecked[args.member.id] = Date.now();
-            }
-        })
-        .catch(collected => {
-          voiceState.kick();
-          channelMonitor.removeUserFromQueue(args.member.id);
-          resultsMessage.edit('User is AFK. Removing them from the queue.').catch(() => {});
-          msg.reply('You failed to react to the message in time. You have been removed from the queue.');
-        });
-    });
+    return;
   }
 }
 

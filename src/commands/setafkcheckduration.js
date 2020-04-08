@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
+const prettyMS = require('pretty-ms');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
@@ -37,7 +38,7 @@ class SetAfkCheckDurationCommand extends Command {
       return sendmessage(message.channel, 'Error: `afkCheckDuration` must be between 15 sec and 15 min');
     }
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {
@@ -53,7 +54,7 @@ class SetAfkCheckDurationCommand extends Command {
     channelMonitor.afkCheckDuration = afkCheckDuration;
     ds.saveMonitor(channelMonitor.id);
 
-    return sendmessage(message.channel, `Successfully changed AFK check duration for ${channelMonitor.name} to ${afkCheckDuration}ms!`);
+    return sendmessage(message.channel, `Successfully changed AFK check duration for ${channelMonitor.name} to ${prettyMS(afkCheckDuration)}!`);
   }
 }
 

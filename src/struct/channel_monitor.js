@@ -1,4 +1,5 @@
 const { Util } = require('discord.js');
+const AFKCheckScheduler = require('./afk_check_scheduler');
 
 class ChannelMonitor {
   constructor(client, data) {
@@ -18,11 +19,17 @@ class ChannelMonitor {
     this.removalTimers = {};
 
     this.snowflakeQueue = data.snowflakeQueue;
+    this.automatic = data.automatic;
+    this.autoOutput = data.autoOutput;
 
     this.initialised = false;
+    this.initialising = false;
   }
 
   async init() {
+    if (this.initialised || this.initialising) return;
+    this.initialising = true;
+
     this.channel = this.client.channels.resolve(this.id);
     this.name = this.channel.name;
 
@@ -32,7 +39,11 @@ class ChannelMonitor {
 
     this.updateDisplay();
 
+    this.afkCheckScheduler = new AFKCheckScheduler(this.client, this, this.automatic);
+    this.afkCheckScheduler.start();
+
     this.initialised = true;
+    this.initialising = false;
   }
 
   async populateQueue(snowflakeQueue) {
@@ -60,7 +71,7 @@ class ChannelMonitor {
       return self.indexOf(value) === index;
     });
 
-    this.client.datasource.saveMonitor(this.id);
+    this.client.dataSource.saveMonitor(this.id);
   }
 
   get message() {
@@ -80,7 +91,7 @@ class ChannelMonitor {
     } else {
       this.queue.push(this.client.users.resolve(userID));
       this.timeoutUpdateDisplay();
-      this.client.datasource.saveMonitor(this.id);
+      this.client.dataSource.saveMonitor(this.id);
     }
   }
 
@@ -96,7 +107,7 @@ class ChannelMonitor {
     if (removeIndex == -1) return;
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
-    this.client.datasource.saveMonitor(this.id);
+    this.client.dataSource.saveMonitor(this.id);
     delete this.removalTimers[userID];
   }
 

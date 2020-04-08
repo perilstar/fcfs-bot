@@ -8,7 +8,7 @@ client.start();
 async function saveAndExit() {
   console.log('Saving...');
   try {
-    await client.datasource.save();
+    await client.dataSource.save();
     console.log('Data Saved.');
     process.exit(0);
   } catch (err) {

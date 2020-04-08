@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const parseDuration = require('parse-duration');
+const prettyMS = require('pretty-ms');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
 
@@ -37,7 +38,7 @@ class SetRejoinWindowCommand extends Command {
       return sendmessage(message.channel, 'Error: `rejoinWindow` must be between 0 sec and 10 min');
     }
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {
@@ -54,7 +55,7 @@ class SetRejoinWindowCommand extends Command {
     channelMonitor.rejoinWindow = rejoinWindow;
     ds.saveMonitor(channelMonitor.id);
 
-    return sendmessage(message.channel, `Successfully changed rejoin window for ${channelMonitor.name} to ${rejoinWindow}ms!`);  }
+    return sendmessage(message.channel, `Successfully changed rejoin window for ${channelMonitor.name} to ${prettyMS(channelMonitor.rejoinWindow)}!`);  }
 }
 
 module.exports = SetRejoinWindowCommand;

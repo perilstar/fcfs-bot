@@ -1,4 +1,5 @@
 const { Command } = require('discord-akairo');
+const prettyMS = require('pretty-ms');
 const sendmessage = require('../util/sendmessage');
 
 class InfoCommand extends Command {
@@ -21,7 +22,7 @@ class InfoCommand extends Command {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {
@@ -38,8 +39,8 @@ class InfoCommand extends Command {
       `Monitoring: ${channelMonitor.name} (ID ${channelMonitor.id})`,
       `Display: #${channelMonitor.displayChannelName} (ID ${channelMonitor.displayChannel})`,
       `Showing the first ${channelMonitor.displaySize} people in the queue`,
-      `Rejoin Window: ${channelMonitor.rejoinWindow}ms`,
-      `AFK Check Duration: ${channelMonitor.afkCheckDuration}ms`,
+      `Rejoin Window: ${prettyMS(channelMonitor.rejoinWindow)}`,
+      `AFK Check Duration: ${prettyMS(channelMonitor.afkCheckDuration)}`,
     ];
 
     return sendmessage(message.channel, '**Waiting Room Info**\n```\n' + lines.join('\n') + '\n```');

@@ -23,7 +23,7 @@ class SetPositionCommand extends Command {
   }
 
   async exec(message, args) {
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!args.member) {

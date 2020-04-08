@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const mps_mod = require('../util/mps_mod');
 const sendmessage = require('../util/sendmessage');
+const AFKChecker = require('../struct/afk_checker');
 
 class AfkCheckTopCommand extends Command {
   constructor() {
@@ -23,7 +24,7 @@ class AfkCheckTopCommand extends Command {
       return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
     }
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {
@@ -36,78 +37,41 @@ class AfkCheckTopCommand extends Command {
       return sendmessage(message.channel, `Error: there are no members in queue in ${args.monitorChannel.name}`);
     }
 
-    if ((Date.now() - channelMonitor.lastMassAfkCheck) < Math.max(900000, 300000 + channelMonitor.afkCheckDuration)) {
-      return sendmessage(message.channel, 'The mass afk check command is on cooldown for that channel.');
-    }
-    channelMonitor.lastMassAfkCheck = Date.now();
+    const update = (message, data) => {
+      let text = `Mass AFK-checking...\n\n`;
+      if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
+      if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
+      if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
+      if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
 
-    let resultsMessage = await message.channel.send('Mass AFK-checking...');
+      message.edit(text).catch(() => {});
+    };
 
-    let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
+    const finalize = (message, data) => {
+      let text = `Mass AFK-checking complete!\n\n`;
+      if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
+      if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
+      if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
+      if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
+
+      message.edit(text).catch(() => {});
+    };
+
+    let resultsMessage = await sendmessage(message.channel, 'Mass AFK-checking...');
 
     let top = channelMonitor.queue.slice(0, channelMonitor.displaySize).map(user => message.guild.members.cache.get(user.id));
 
-    let actuallyInVC = top.filter(member => (member.voice && member.voice.channelID === channelMonitor.id));
+    let afkChecker = new AFKChecker(this.client, server, channelMonitor, top);
 
-    let notInVC = top.length - actuallyInVC.length;
-    let notAFK = 0;
-    let afk = 0;
-
-    const update = (message) => {
-      let text = `Mass AFK-checking...\n\n`;
-      if (notInVC) text += `${notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
-      if (notAFK) text += `${notAFK} member(s) reacted to the message in time\n`;
-      if (afk) text += `${afk} member(s) were booted from the queue\n`;
-
-      message.edit(text).catch(() => {});
-    };
-
-    const finalize = (message) => {
-      let text = `Mass AFK-checking complete!\n\n`;
-      if (notInVC) text += `${notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
-      if (notAFK) text += `${notAFK} member(s) reacted to the message in time\n`;
-      if (afk) text += `${afk} member(s) were booted from the queue\n`;
-
-      message.edit(text).catch(() => {});
-    };
-
-    if (!actuallyInVC.length) return finalize(resultsMessage);
-
-    let updateInterval = setInterval(() => update(resultsMessage), 10000);
-
-    actuallyInVC.forEach(member => {
-      member.send(mentionMessage).then(msg => {
-        msg.react('👍');
-  
-        const filter = (reaction, user) => {
-            return ['👍'].includes(reaction.emoji.name) && user.id === member.id;
-        };
-  
-        msg.awaitReactions(filter, { max: 1, time: channelMonitor.afkCheckDuration, errors: ['time'] })
-          .then(collected => {
-              const reaction = collected.first();
-  
-              if (reaction.emoji.name === '👍') {
-                msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
-                notAFK++;
-                if (afk + notAFK >= actuallyInVC.length) {
-                  clearInterval(updateInterval);
-                  finalize(resultsMessage);
-                }
-              }
-          })
-          .catch(collected => {
-            member.voice.kick();
-            channelMonitor.removeUserFromQueue(member.id);
-            msg.reply('You failed to react to the message in time. You have been removed from the queue.');
-            afk++;
-            if (afk + notAFK >= actuallyInVC.length) {
-              clearInterval(updateInterval);
-              finalize(resultsMessage);
-            }
-          });
-      });
+    afkChecker.on('update', (data) => {
+      update(resultsMessage, data);
     });
+
+    let results = await afkChecker.run();
+    finalize(resultsMessage, results);
+    afkChecker.removeAllListeners('update');
+
+    return;
   }
 }
 

@@ -32,7 +32,7 @@ class CreateWaitingRoomCommand extends Command {
   }
 
   async exec(message, args) {
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!args.monitorChannel) {
@@ -79,7 +79,9 @@ class CreateWaitingRoomCommand extends Command {
       displaySize: args.displaySize,
       rejoinWindow: rejoinWindow,
       afkCheckDuration: afkCheckDuration,
-      snowflakeQueue: []
+      snowflakeQueue: [],
+      automatic: -1,
+      auto_output: '',
     };
 
     message.delete();
@@ -87,7 +89,7 @@ class CreateWaitingRoomCommand extends Command {
     let channelMonitor = server.addChannelMonitor(data);
     await channelMonitor.init();
     
-    this.client.datasource.saveMonitor(args.monitorChannel.id);
+    this.client.dataSource.saveMonitor(args.monitorChannel.id);
   }
 }
 

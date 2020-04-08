@@ -31,7 +31,7 @@ class DataSource {
 
     let tableExists = db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='server'`);
     if (!tableExists) {
-      await db.run(`PRAGMA user_version = 2`);
+      await db.run(`PRAGMA user_version = 3`);
     }
 
     await db.run(`CREATE TABLE IF NOT EXISTS monitor (
@@ -42,7 +42,9 @@ class DataSource {
       display_size INTEGER ,
       rejoin_window INTEGER ,
       afk_check_duration INTEGER ,
-      queue TEXT 
+      queue TEXT ,
+      automatic INTEGER ,
+      auto_output TEXT
     )`);
 
     await db.run(`CREATE TABLE IF NOT EXISTS server (
@@ -85,8 +87,11 @@ class DataSource {
         displaySize: row.display_size,
         rejoinWindow: row.rejoin_window,
         afkCheckDuration: row.afk_check_duration,
-        snowflakeQueue: row.queue.split(',').filter(Boolean)
+        snowflakeQueue: row.queue.split(',').filter(Boolean),
+        automatic: row.automatic || -1,
+        autoOutput: row.auto_output
       };
+
       if (!this.servers[row.guild_id]) {
         this.addServer(row.guild_id, 'fcfs!', [], [], []);
         this.saveServerSnowflakes.push(row.guild_id);
@@ -291,10 +296,12 @@ class DataSource {
         monitor.displaySize,
         monitor.rejoinWindow,
         monitor.afkCheckDuration,
-        monitor.queue.map(member => member.id).join(',')
+        monitor.queue.map(member => member.id).join(','),
+        monitor.afkCheckScheduler.interval,
+        monitor.autoOutput
       ];
 
-      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?)');
+      placeholders.push('(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
       values = values.concat(v);
     }
 
@@ -302,7 +309,7 @@ class DataSource {
 
 
     let sql = `INSERT INTO monitor (id, guild_id, display_channel, display_message,
-      display_size, rejoin_window, afk_check_duration, queue)
+      display_size, rejoin_window, afk_check_duration, queue, automatic, auto_output)
     VALUES ${placeholders.join(', ')}
     ON CONFLICT(id) DO UPDATE SET
     id = excluded.id,
@@ -312,7 +319,9 @@ class DataSource {
     display_size = excluded.display_size,
     rejoin_window = excluded.rejoin_window,
     afk_check_duration = excluded.afk_check_duration,
-    queue = excluded.queue`;
+    queue = excluded.queue,
+    automatic = excluded.automatic,
+    auto_output = excluded.auto_output`;
 
     await db.run(sql, values);
   }

@@ -19,7 +19,7 @@ class SetPrefixCommand extends Command {
   }
 
   async exec(message, args) {
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!args.prefix) {
@@ -28,7 +28,7 @@ class SetPrefixCommand extends Command {
     
     server.prefix = args.prefix;
     
-    this.client.datasource.saveServer(message.guild.id);
+    this.client.dataSource.saveServer(message.guild.id);
 
     return sendmessage(message.channel, `Successfully changed prefix to ${args.prefix}`);
   }

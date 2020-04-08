@@ -21,7 +21,7 @@ class ListWaitingRoomsCommand extends Command {
   async exec(message, args) {
     let page = args.page || 1;
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     let channelMonitors = server.channelMonitors;

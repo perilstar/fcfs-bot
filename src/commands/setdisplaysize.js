@@ -34,7 +34,7 @@ class SetDisplaySizeCommand extends Command {
       return sendmessage(message.channel, 'Error: `displaySize` must be between 1 and 20');
     }
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     if (!server.channelMonitors[args.monitorChannel.id]) {

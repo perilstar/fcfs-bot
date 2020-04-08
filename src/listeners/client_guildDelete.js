@@ -9,7 +9,7 @@ class GuildDeleteListener extends Listener {
   }
 
   async exec(guild) {
-    this.client.datasource.removeServer(guild.id);
+    this.client.dataSource.removeServer(guild.id);
   }
 }
 

@@ -13,7 +13,7 @@ class MessageDeleteListener extends Listener {
     let channel = message.channel;
     if (!(channel instanceof TextChannel)) return;
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
 
     let server = ds.servers[channel.guild.id];
 

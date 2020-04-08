@@ -14,7 +14,7 @@ class ReadyListener extends Listener {
     setInterval(() => this.client.user.setActivity(`fcfs!help | v${this.client.version}`), 60000);
     console.log('Client is ready!');
     if (this.client.ready) return;
-    await this.client.datasource.revUpThoseFryers();
+    await this.client.dataSource.revUpThoseFryers();
     this.client.commandHandler.loadAll(); 
     this.client.commandHandler.useListenerHandler(this.listenerHandler);
     this.client.listenerHandler.loadAll(this.client.listenerHandler.directory, path => !path.includes('client_ready.js'));

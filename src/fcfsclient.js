@@ -1,6 +1,6 @@
 const { AkairoClient, CommandHandler, InhibitorHandler, ListenerHandler } = require('discord-akairo');
 const { TextChannel } = require('discord.js');
-const DataSource = require('./struct/datasource');
+const DataSource = require('./struct/data_source');
 const ReadyListener = require('./listeners/client_ready');
 
 const TOKEN = process.env.FCFS_BOT_TOKEN;
@@ -14,13 +14,13 @@ class FCFSClient extends AkairoClient {
       disableEveryone: true
     });
 
-    this.datasource = new DataSource(this);
+    this.dataSource = new DataSource(this);
 
     this.commandHandler = new CommandHandler(this, {
       directory: './src/commands/',
       prefix: message => {
         if (message.channel instanceof TextChannel) {
-          return ['fcfs!', this.datasource.servers[message.guild.id].prefix];
+          return ['fcfs!', this.dataSource.servers[message.guild.id].prefix];
         } else {
           return ['fcfs!', ''];
         }

@@ -12,7 +12,7 @@ class RoleDeleteListener extends Listener {
   async exec(role) {
     let guild = role.guild;
 
-    let ds = this.client.datasource;
+    let ds = this.client.dataSource;
 
     let server = ds.servers[guild.id];
 

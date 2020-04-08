@@ -2,6 +2,7 @@ async function dbupdate(db) {
   let version = (await db.get('PRAGMA user_version')).user_version;
 
   if (version < 2) await v1to2(db);
+  if (version < 3) await v2to3(db);
 }
 
 async function v1to2(db) {
@@ -65,6 +66,13 @@ async function v1to2(db) {
   await db.run(`DROP TABLE _monitor_old`);
   await db.run(`DROP TABLE _server_old`);
   await db.run(`PRAGMA user_version = 2`);
+}
+
+async function v2to3(db) {
+  await db.run(`ALTER TABLE monitor ADD COLUMN automatic INTEGER`);
+  await db.run(`ALTER TABLE monitor ADD COLUMN auto_output TEXT`);
+
+  await db.run(`PRAGMA user_version = 3`);
 }
 
 module.exports = dbupdate;
