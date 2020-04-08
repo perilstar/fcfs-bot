@@ -74,6 +74,12 @@ Sets the rejoin window for the waiting room associated with `monitorChannel`.
 Sets the AFK check duration for the waiting room associated with `monitorChannel`.  
 *Aliases:* `sacd`
 
+`setautomatic "<monitorChannel>" <interval> [outputChannel]`
+Creates an automatic afk-check every `interval`, putting the output in `outputchannel` if specified, or the channel
+the command was typed in otherwise.
+*Aliases:* `sa`
+*Example:* `fcfs!sa "Waiting Room 1" 45m` OR `fcfs!sa "Waiting Room 1" off`
+
 ## Bot Mod commands:  
 *All of these commands require Bot Mod permissions to use. Bot Mods may also use commands from Bot Helper.*
 

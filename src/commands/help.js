@@ -109,6 +109,12 @@ class HelpCommand extends Command {
         \`setafkcheckduration "<monitorChannel>" <afkCheckDuration>\`
         Sets the AFK check duration for the waiting room associated with \`monitorChannel\`.
         *Aliases:* \`sacd\`
+
+        \`setautomatic "<monitorChannel>" <interval> [outputChannel]\`
+        Creates an automatic afk-check every \`interval\`, putting the output in \`outputchannel\` if specified, or the channel
+        the command was typed in otherwise.
+        *Aliases:* \`sa\`
+        *Example:* \`fcfs!sa "Waiting Room 1" 45m\` OR \`fcfs!sa "Waiting Room 1" off\`
       `,
       mod: `
         __Bot Mod commands:__
