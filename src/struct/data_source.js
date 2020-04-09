@@ -29,31 +29,31 @@ class DataSource {
 
     let db = await sqlite.open('./db/fcfs.db');
 
-    let tableExists = db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='server'`);
+    let tableExists = await db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='server'`);
     if (!tableExists) {
+      await db.run(`CREATE TABLE IF NOT EXISTS monitor (
+        id TEXT PRIMARY KEY ,
+        guild_id TEXT ,
+        display_channel TEXT ,
+        display_message TEXT ,
+        display_size INTEGER ,
+        rejoin_window INTEGER ,
+        afk_check_duration INTEGER ,
+        queue TEXT ,
+        automatic INTEGER ,
+        auto_output TEXT
+      )`);
+  
+      await db.run(`CREATE TABLE IF NOT EXISTS server (
+        id TEXT PRIMARY KEY ,
+        bot_prefix TEXT ,
+        admin_roles TEXT ,
+        mod_roles TEXT ,
+        helper_roles TEXT  
+      )`);
+
       await db.run(`PRAGMA user_version = 3`);
     }
-
-    await db.run(`CREATE TABLE IF NOT EXISTS monitor (
-      id TEXT PRIMARY KEY ,
-      guild_id TEXT ,
-      display_channel TEXT ,
-      display_message TEXT ,
-      display_size INTEGER ,
-      rejoin_window INTEGER ,
-      afk_check_duration INTEGER ,
-      queue TEXT ,
-      automatic INTEGER ,
-      auto_output TEXT
-    )`);
-
-    await db.run(`CREATE TABLE IF NOT EXISTS server (
-      id TEXT PRIMARY KEY ,
-      bot_prefix TEXT ,
-      admin_roles TEXT ,
-      mod_roles TEXT ,
-      helper_roles TEXT  
-    )`);
 
     await dbupdate(db);
 
