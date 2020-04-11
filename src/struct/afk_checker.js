@@ -47,8 +47,7 @@ class AFKChecker extends EventEmitter {
               return;
             }
         })
-        .catch(err => {
-          if (err != 'time') throw err;
+        .catch(collected => {
           voiceState.kick();
           this.channelMonitor.removeUserFromQueue(userToCheck.id);
           this.afk++;
