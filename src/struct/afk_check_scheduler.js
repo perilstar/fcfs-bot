@@ -23,7 +23,7 @@ class AFKCheckScheduler {
         if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
         if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
 
-        message.edit(text).catch(() => {});
+        message.edit(text).catch(err => console.log(`Failed to update in auto check!\n${err.message}`));
       };
 
       const finalize = (message, data) => {
@@ -33,7 +33,7 @@ class AFKCheckScheduler {
         if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
         if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
 
-        message.edit(text).catch(() => {});
+        message.edit(text).catch(err => console.log(`Failed to finalize in auto check!\n${err.message}`));
       };
 
       let resultsMessage = await sendmessage(outputChannel, 'Auto AFK-checking...');

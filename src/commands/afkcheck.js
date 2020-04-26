@@ -44,11 +44,11 @@ class AfkCheckCommand extends Command {
     let results = await afkChecker.run();
 
     if (results.recentlyChecked > 0) {
-      resultsMessage.edit('That user was recently AFK-Checked. Try again later.').catch(() => {});
+      resultsMessage.edit('That user was recently AFK-Checked. Try again later.').catch(err => console.log(`Failed to skip manual check!\n${err.message}`));
     } else if (results.afk > 0) {
-      resultsMessage.edit('User is AFK. Removing them from the queue.').catch(() => {});
+      resultsMessage.edit('User is AFK. Removing them from the queue.').catch(err => console.log(`Failed to update afk in manual check!\n${err.message}`));
     } else if (results.notAFK > 0) {
-      resultsMessage.edit('User is not AFK. Keeping them in the queue.').catch(() => {});
+      resultsMessage.edit('User is not AFK. Keeping them in the queue.').catch(err => console.log(`Failed to update not afk in manual check!\n${err.message}`));
     }
 
     return;

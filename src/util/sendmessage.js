@@ -9,6 +9,7 @@ async function sendmessage(channel, text) {
         console.error(`Failed to send message in #${channel.name} (ID #${channel.id}) due to Missing Permissions!`);
         return null;
       }
+      console.log(`Error trying to send a message!\n${err.message}`);
       throw(err);
     });
 }

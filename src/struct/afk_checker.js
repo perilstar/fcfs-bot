@@ -24,14 +24,16 @@ class AFKChecker extends EventEmitter {
     
     let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
     await userToCheck.send(mentionMessage).then(msg => {
-      msg.react('👍');
+      msg.react('👍')
+        .catch(err => console.log(`Failed to add reaction!\n${err.message}`));
 
       const filter = (reaction, user) => {
           return ['👍'].includes(reaction.emoji.name) && user.id === userToCheck.id;
       };
 
       let halfwayTimer = setTimeout(() => {
-        userToCheck.send('WARNING! Half of the afk check duration has elapsed! React now to keep your spot in queue!');
+        userToCheck.send('WARNING! Half of the afk check duration has elapsed! React now to keep your spot in queue!')
+          .catch(err => console.log(`Failed to send halfway-mark message!\n${err.message}`));
       }, this.channelMonitor.afkCheckDuration / 2);
 
       return msg.awaitReactions(filter, { max: 1, time: this.channelMonitor.afkCheckDuration, errors: ['time'] })
@@ -39,7 +41,8 @@ class AFKChecker extends EventEmitter {
             const reaction = collected.first();
 
             if (reaction.emoji.name === '👍') {
-              msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.');
+              msg.edit('**[AFK CHECK]**\nThank you! You will be kept in the queue.')
+                .catch(err => console.log(`Failed to edit message!\n${err.message}`));
               clearTimeout(halfwayTimer);
               this.notAFK++;
               this.emitIfSafe();
@@ -48,14 +51,15 @@ class AFKChecker extends EventEmitter {
             }
         })
         .catch(collected => {
-          voiceState.kick();
+          voiceState.kick().catch(err => console.error(`Failed to kick user!\n${err.message}`));
           this.channelMonitor.removeUserFromQueue(userToCheck.id);
           this.afk++;
           this.emitIfSafe();
-          msg.reply('You failed to react to the message in time. You have been removed from the queue.');
+          msg.reply('You failed to react to the message in time. You have been removed from the queue.')
+            .catch(err => console.log(`Failed to send missed check message!\n${err.message}`));
           return;
         });
-    });
+    }).catch(err => console.log(`Failed to send AFK check message to user ${userToCheck.id}!\n${err.message}`));
   }
 
   async run() {
