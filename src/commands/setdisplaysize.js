@@ -15,7 +15,7 @@ class SetDisplaySizeCommand extends Command {
         {
           id: 'monitorChannel',
           type: 'monitorChannel',
-          otherwise: (msg, { failure }) => apf(msg, 'monitorChannel', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         },
         {
           id: 'displaySize',
@@ -28,7 +28,7 @@ class SetDisplaySizeCommand extends Command {
             if (Argument.isFailure(result)) return Flag.fail({ reason: 'outOfRange', n, min, max });
             return n;
           },
-          otherwise: (msg, { failure }) => apf(msg, 'displaySize', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'displaySize', failure)
         }
       ]
     });

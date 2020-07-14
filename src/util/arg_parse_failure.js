@@ -1,6 +1,6 @@
 const { Util } = require('discord.js');
 
-module.exports = (message, arg, failure, client) => {
+module.exports = (client, message, arg, failure) => {
   let msg = '';
 
   if (!failure) return 'An unkown internal error occured! Please report this to peril#1024.';

@@ -13,7 +13,7 @@ class InfoCommand extends Command {
         {
           id: 'monitorChannel',
           type: 'monitorChannel',
-          otherwise: (msg, { failure }) => apf(msg, 'monitorChannel', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         }
       ]
     });

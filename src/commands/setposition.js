@@ -14,12 +14,12 @@ class SetPositionCommand extends Command {
         {
           id: 'member',
           type: 'queuedMember',
-          otherwise: (msg, { failure }) => apf(msg, 'member', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'member', failure)
         },
         {
           id: 'position',
           type: Argument.compose('required', 'integer'),
-          otherwise: (msg, { failure }) => apf(msg, 'position', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'position', failure)
         }
       ]
     });

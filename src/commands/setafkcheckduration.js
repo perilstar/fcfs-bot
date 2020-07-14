@@ -17,7 +17,7 @@ class SetAfkCheckDurationCommand extends Command {
         {
           id: 'monitorChannel',
           type: 'monitorChannel',
-          otherwise: (msg, { failure }) => apf(msg, 'monitorChannel', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         },
         {
           id: 'afkCheckDuration',
@@ -29,7 +29,7 @@ class SetAfkCheckDurationCommand extends Command {
             if (n < parseDuration(min) || n > parseDuration(max)) return Flag.fail({ reason: 'outOfRange', n, min, max });
             return n;
           },
-          otherwise: (msg, { failure }) => apf(msg, 'afkCheckDuration', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'afkCheckDuration', failure)
         }
       ]
     });

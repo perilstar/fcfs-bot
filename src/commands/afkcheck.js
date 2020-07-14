@@ -15,7 +15,7 @@ class AfkCheckCommand extends Command {
         {
           id: 'member',
           type: 'queuedMember',
-          otherwise: (msg, { failure }) => apf(msg, 'member', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'member', failure)
         },
       ]
     });

@@ -17,7 +17,7 @@ class SetPrefixCommand extends Command {
             if (!phrase) return Flag.fail({ reason: 'missingArg' });
             return phrase;
           },
-          otherwise: (msg, { failure }) => apf(msg, 'prefix', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'prefix', failure)
         }
       ]
     });

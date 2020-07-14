@@ -25,7 +25,9 @@ class AFKChecker extends EventEmitter {
     let mentionMessage = '**[AFK CHECK]**\nPress thumbs up if you are not AFK to keep your place in the waiting list';
     await userToCheck.send(mentionMessage).then(msg => {
       msg.react('👍')
-        .catch(err => console.log(`Failed to add reaction!\n${err.message}`));
+        .catch(err => {
+          console.log(`Failed to add reaction!\n${err.message}`);
+        });
 
       const filter = (reaction, user) => {
           return ['👍'].includes(reaction.emoji.name) && user.id === userToCheck.id;
@@ -33,7 +35,9 @@ class AFKChecker extends EventEmitter {
 
       let halfwayTimer = setTimeout(() => {
         userToCheck.send('WARNING! Half of the afk check duration has elapsed! React now to keep your spot in queue!')
-          .catch(err => console.log(`Failed to send halfway-mark message!\n${err.message}`));
+          .catch(err => {
+            console.log(`Failed to send halfway-mark message!\n${err.message}`);
+          });
       }, this.channelMonitor.afkCheckDuration / 2);
 
       return msg.awaitReactions(filter, { max: 1, time: this.channelMonitor.afkCheckDuration, errors: ['time'] })
@@ -59,7 +63,12 @@ class AFKChecker extends EventEmitter {
             .catch(err => console.log(`Failed to send missed check message!\n${err.message}`));
           return;
         });
-    }).catch(err => console.log(`Failed to send AFK check message to user ${userToCheck.id}!\n${err.message}`));
+    }).catch(err => {
+      if (err.code === 50007) {
+        voiceState.kick();
+      }
+      console.log(`Failed to send AFK check message to user ${userToCheck.id}!\n${err.message}`);
+    });
   }
 
   async run() {

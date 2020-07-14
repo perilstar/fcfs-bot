@@ -32,7 +32,7 @@ class CheckPositionCommand extends Command {
 
             return member;
           },
-          otherwise: (msg, { failure }) => apf(msg, 'member', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'member', failure)
         }
       ]
     });

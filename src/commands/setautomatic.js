@@ -16,7 +16,7 @@ class SetDisplaySizeCommand extends Command {
       *args(message) {
         const monitorChannel = yield {
           type: 'monitorChannel',
-          otherwise: (msg, { failure }) => apf(msg, 'monitorChannel', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         };
         const interval = yield {
           type: async (message, phrase) => {
@@ -29,7 +29,7 @@ class SetDisplaySizeCommand extends Command {
             if (Argument.isFailure(result)) return Flag.fail({ reason: 'invalidInterval', n: result, min, max });
             return result;
           },
-          otherwise: (msg, { failure }) => apf(msg, 'interval', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'interval', failure)
         };
 
         const outputChannel = yield {
@@ -43,7 +43,7 @@ class SetDisplaySizeCommand extends Command {
             }
             return this.client.commandHandler.resolver.type('textChannelCustom')(message, phrase);
           },
-          otherwise: (msg, { failure }) => apf(msg, 'outputChannel', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'outputChannel', failure)
         };
         return { monitorChannel, interval, outputChannel };
       }

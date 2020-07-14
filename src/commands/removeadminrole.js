@@ -13,7 +13,7 @@ class RemoveAdminRoleCommand extends Command {
         {
           id: 'role',
           type: 'roleCustom',
-          otherwise: (msg, { failure }) => apf(msg, 'role', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'role', failure)
         }
       ]
     });

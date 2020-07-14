@@ -14,7 +14,7 @@ class DeleteWaitingRoomCommand extends Command {
         {
           id: 'monitorChannel',
           type: 'monitorChannel',
-          otherwise: (msg, { failure }) => apf(msg, 'afkCheckDuration', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'afkCheckDuration', failure)
         }
       ]
     });

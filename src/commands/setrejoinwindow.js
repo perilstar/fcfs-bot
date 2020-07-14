@@ -28,7 +28,7 @@ class SetRejoinWindowCommand extends Command {
             if (n < parseDuration(min) || n > parseDuration(max)) return Flag.fail({ reason: 'outOfRange', n, min, max });
             return n;
           },
-          otherwise: (msg, { failure }) => apf(msg, 'rejoinWindow', failure)
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'rejoinWindow', failure)
         }
       ]
     });
