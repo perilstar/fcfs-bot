@@ -1,8 +1,10 @@
-const { Command } = require('discord-akairo');
+const { Command, Argument, Flag } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const prettyMS = require('pretty-ms');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
+const Constants = require('../util/constants');
 
 class SetRejoinWindowCommand extends Command {
   constructor() {
@@ -14,45 +16,33 @@ class SetRejoinWindowCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel'
+          type: 'monitorChannel'
         },
         {
           id: 'rejoinWindow',
-          type: 'string'
+          type: (message, phrase) => {
+            let n = this.client.commandHandler.resolver.type('duration')(message, phrase);
+            if (Argument.isFailure(n)) return n;
+            const min = Constants.RejoinWindow.MIN;
+            const max = Constants.RejoinWindow.MAX;
+            if (n < parseDuration(min) || n > parseDuration(max)) return Flag.fail({ reason: 'outOfRange', n, min, max });
+            return n;
+          },
+          otherwise: (msg, { failure }) => apf(msg, 'rejoinWindow', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-    if (!args.rejoinWindow) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
-    }
-
-    let rejoinWindow = parseDuration(args.rejoinWindow);
-
-    if (rejoinWindow < 0 || rejoinWindow > 600000) {
-      return sendmessage(message.channel, 'Error: `rejoinWindow` must be between 0 sec and 10 min');
-    }
-
     let ds = this.client.dataSource;
-    let server = ds.servers[message.guild.id];
-
-    if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
-    }
-    
-
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
+    let channelMonitor = args.monitorChannel;
 
     if (!channelMonitor.initialised) {
       await channelMonitor.init();
     }
 
-    channelMonitor.rejoinWindow = rejoinWindow;
+    channelMonitor.rejoinWindow = args.rejoinWindow;
     ds.saveMonitor(channelMonitor.id);
 
     return sendmessage(message.channel, `Successfully changed rejoin window for ${channelMonitor.name} to ${prettyMS(channelMonitor.rejoinWindow)}!`);  }

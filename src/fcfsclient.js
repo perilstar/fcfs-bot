@@ -2,6 +2,7 @@ const { AkairoClient, CommandHandler, InhibitorHandler, ListenerHandler } = requ
 const { TextChannel } = require('discord.js');
 const DataSource = require('./struct/data_source');
 const ReadyListener = require('./listeners/client_ready');
+const ArgTypesRegistrar = require('./util/arg_types_registrar');
 
 const TOKEN = process.env.FCFS_BOT_TOKEN;
 const version = require('../package.json').version;
@@ -27,6 +28,9 @@ class FCFSClient extends AkairoClient {
       },
       allowMention: true
     });
+
+    let atr = new ArgTypesRegistrar(this);
+    atr.registerTypes();
 
     this.listenerHandler = new ListenerHandler(this, {
         directory: './src/listeners/'

@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
 
 class DeleteWaitingRoomCommand extends Command {
   constructor() {
@@ -12,25 +13,16 @@ class DeleteWaitingRoomCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel',
+          type: 'monitorChannel',
+          otherwise: (msg, { failure }) => apf(msg, 'afkCheckDuration', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-
     let ds = this.client.dataSource;
-    let server = ds.servers[message.guild.id];
-
-    if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
-    }
-
-    ds.removeMonitor(message.guild.id, monitorChannel.id);
+    ds.removeMonitor(message.guild.id, args.monitorChannel.id);
 
     return sendmessage(message.channel, 'Successfully deleted!');
   }

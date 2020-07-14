@@ -1,5 +1,7 @@
 const { Command } = require('discord-akairo');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
+const Constants = require('../util/constants');
 
 class AddHelperRoleCommand extends Command {
   constructor() {
@@ -11,24 +13,22 @@ class AddHelperRoleCommand extends Command {
       args: [
         {
           id: 'role',
-          type: 'role'
+          type: 'roleCustom',
+          otherwise: (msg, { failure }) => apf(msg, 'role', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.role) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`role\`. Use fcfs!help for commands.`);
-    }
 
     let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
     let helperRoles = server.helperRoles;
 
-    if (helperRoles.length >= 10) {
-      return sendmessage(message.channel, `Error: You can not add more than 10 roles as bot helper!`);
+    if (helperRoles.length >= Constants.AddedRoles.MAX) {
+      return sendmessage(message.channel, `Error: You can not add more than ${Constants.AddedRoles.MAX} roles as bot helper!`);
     }
 
     if (helperRoles.includes(args.role.id)) {

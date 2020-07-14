@@ -24,16 +24,16 @@ class ChannelDeleteListener extends Listener {
 
     let server = ds.servers[channel.guild.id];
 
-    if (channel.type == 'voice') {
+    if (channel.type === 'voice') {
       if (server.channelMonitors[channel.id]) {
         this.removeMessage(server.channelMonitors[channel.id]);
         ds.removeMonitor(server.id, channel.id);
       }
     }
 
-    if (channel.type == 'text') {
+    if (channel.type === 'text') {
       for (let snowflake in server.channelMonitors) {
-        if (server.channelMonitors[snowflake].displayChannel == channel.id) {
+        if (server.channelMonitors[snowflake].displayChannel === channel.id) {
           ds.removeMonitor(server.id, snowflake);
         }
       }

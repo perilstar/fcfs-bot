@@ -5,7 +5,7 @@ async function sendmessage(channel, text) {
   let cleanContent = Util.removeMentions(text);
   return channel.send(cleanContent)
     .catch(err => {
-      if (err.message == 'Missing Permissions') {
+      if (err.message === 'Missing Permissions') {
         console.error(`Failed to send message in #${channel.name} (ID #${channel.id}) due to Missing Permissions!`);
         return null;
       }

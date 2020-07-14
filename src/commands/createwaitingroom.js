@@ -1,7 +1,9 @@
-const { Command } = require('discord-akairo');
+const { Command, Argument, Flag } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
+const Constants = require('../util/constants');
 
 class CreateWaitingRoomCommand extends Command {
   constructor() {
@@ -13,19 +15,43 @@ class CreateWaitingRoomCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel',
+          type: 'voiceChannelCustom',
+          otherwise: (msg, { failure }) => apf(msg, 'monitorChannel', failure)
         },
         {
           id: 'displaySize',
-          type: 'integer'
+          type: async (message, phrase) => {
+            if (!phrase) return Flag.fail({ reason: 'missingArg' });
+            const n = phrase;
+            const min = Constants.DisplaySize.MIN;
+            const max = Constants.DisplaySize.MAX;
+            const result = await Argument.range('integer', min, max, true).call(this, message, phrase);
+            if (Argument.isFailure(result)) return Flag.fail({ reason: 'outOfRange', n, min, max });
+            return n;
+            },
+          otherwise: (msg, { failure }) => apf(msg, 'displaySize', failure)
         },
         {
           id: 'rejoinWindow',
-          type: 'string'
+          type: (message, phrase) => {
+            let n = this.client.commandHandler.resolver.type('duration')(message, phrase);
+            const min = Constants.RejoinWindow.MIN;
+            const max = Constants.RejoinWindow.MAX;
+            if (n < parseDuration(min) || n > parseDuration(max)) return Flag.fail({ reason: 'outOfRange', n, min, max });
+            return n;
+          },
+          otherwise: (msg, { failure }) => apf(msg, 'rejoinWindow', failure)
         },
         {
           id: 'afkCheckDuration',
-          type: 'string'
+          type: (message, phrase) => {
+            let n = this.client.commandHandler.resolver.type('duration')(message, phrase);
+            const min = Constants.AFKCheckDuration.MIN;
+            const max = Constants.AFKCheckDuration.MAX;
+            if (n < parseDuration(min) || n > parseDuration(max)) return Flag.fail({ reason: 'outOfRange', n, min, max });
+            return n;
+          },
+          otherwise: (msg, { failure }) => apf(msg, 'afkCheckDuration', failure)
         }
       ]
     });
@@ -34,38 +60,6 @@ class CreateWaitingRoomCommand extends Command {
   async exec(message, args) {
     let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
-
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-    if (!args.displaySize) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`displaySize\`. Use fcfs!help for commands.`);
-    }
-    if (!args.rejoinWindow) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`rejoinWindow\`. Use fcfs!help for commands.`);
-    }
-    if (!args.afkCheckDuration) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
-    }
-
-    if (server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: channel ${args.monitorChannel.name} is already being monitored!`);
-    }
-
-    let rejoinWindow = parseDuration(args.rejoinWindow);
-    let afkCheckDuration = parseDuration(args.afkCheckDuration);
-
-    if (args.displaySize < 1 || args.displaySize > 20) {
-      return sendmessage(message.channel, 'Error: `displaySize` must be between 1 and 20');
-    }
-
-    if (rejoinWindow < 0 || rejoinWindow > 600000) {
-      return sendmessage(message.channel, 'Error: `rejoinWindow` must be between 0 sec and 10 min');
-    }
-
-    if (afkCheckDuration < 15000 || rejoinWindow > 900000) {
-      return sendmessage(message.channel, 'Error: `afkCheckDuration` must be between 15 sec and 15 min');
-    }
 
     let displayChannel = message.channel;
 
@@ -77,8 +71,8 @@ class CreateWaitingRoomCommand extends Command {
       displayChannel: displayChannel.id,
       displayMessage: displayMessage.id,
       displaySize: args.displaySize,
-      rejoinWindow: rejoinWindow,
-      afkCheckDuration: afkCheckDuration,
+      rejoinWindow: args.rejoinWindow,
+      afkCheckDuration: args.afkCheckDuration,
       snowflakeQueue: [],
       automatic: -1,
       auto_output: '',
