@@ -20,5 +20,5 @@ async function saveAndExit() {
 process.on('SIGINT', saveAndExit);
 
 process.on('message', (msg) => {
-  if (msg == 'shutdown') saveAndExit();
+  if (msg === 'shutdown') saveAndExit();
 });

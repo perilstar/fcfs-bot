@@ -1,6 +1,8 @@
-const { Command } = require('discord-akairo');
+const { Command, Argument, Flag } = require('discord-akairo');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
+const Constants = require('../util/constants');
 
 class SetDisplaySizeCommand extends Command {
   constructor() {
@@ -12,36 +14,30 @@ class SetDisplaySizeCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel'
+          type: 'monitorChannel',
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         },
         {
           id: 'displaySize',
-          type: 'integer'
+          type: async (message, phrase) => {
+            const n = this.client.commandHandler.resolver.type('required')(message, phrase);
+            if (Argument.isFailure(n)) return n;
+            const min = Constants.DisplaySize.MIN;
+            const max = Constants.DisplaySize.MAX;
+            const result = await Argument.range('integer', min, max, true).call(this, message, phrase);
+            if (Argument.isFailure(result)) return Flag.fail({ reason: 'outOfRange', n, min, max });
+            return n;
+          },
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'displaySize', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-    if (!args.displaySize) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`displaySize\`. Use fcfs!help for commands.`);
-    }
-
-    if (args.displaySize < 1 || args.displaySize > 20) {
-      return sendmessage(message.channel, 'Error: `displaySize` must be between 1 and 20');
-    }
-
     let ds = this.client.dataSource;
-    let server = ds.servers[message.guild.id];
 
-    if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
-    }
-
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
+    let channelMonitor = args.monitorChannel;
 
     if (!channelMonitor.initialised) {
       await channelMonitor.init();

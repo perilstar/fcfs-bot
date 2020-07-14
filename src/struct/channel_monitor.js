@@ -96,15 +96,15 @@ class ChannelMonitor {
   }
 
   timeoutRemoveUserFromQueue(userID) {
-    let removeIndex = this.queue.findIndex(el => el.id == userID);
-    if (removeIndex == -1) return;
+    let removeIndex = this.queue.findIndex(el => el.id === userID);
+    if (removeIndex === -1) return;
     this.removalTimers[userID] = setTimeout(() => this.removeUserFromQueue(userID), this.rejoinWindow);
   }
 
   async removeUserFromQueue(userID) {
     if (!this.initialised) await this.init();
-    let removeIndex = this.queue.findIndex(el => el.id == userID);
-    if (removeIndex == -1) return;
+    let removeIndex = this.queue.findIndex(el => el.id === userID);
+    if (removeIndex === -1) return;
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
     this.client.dataSource.saveMonitor(this.id);

@@ -1,8 +1,10 @@
-const { Command } = require('discord-akairo');
+const { Command, Argument, Flag } = require('discord-akairo');
 const parseDuration = require('parse-duration');
 const prettyMS = require('pretty-ms');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
+const Constants = require('../util/constants');
 
 class SetAfkCheckDurationCommand extends Command {
   constructor() {
@@ -14,47 +16,38 @@ class SetAfkCheckDurationCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel'
+          type: 'monitorChannel',
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         },
         {
           id: 'afkCheckDuration',
-          type: 'string'
+          type: (msg, phrase) => {
+            let n = this.client.commandHandler.resolver.type('duration')(mesasge, phrase);
+            if (Argument.isFailure(n)) return n;
+            const min = Constants.AFKCheckDuration.MIN;
+            const max = Constants.AFKCheckDuration.MAX;
+            if (n < parseDuration(min) || n > parseDuration(max)) return Flag.fail({ reason: 'outOfRange', n, min, max });
+            return n;
+          },
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'afkCheckDuration', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-    if (!args.afkCheckDuration) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`afkCheckDuration\`. Use fcfs!help for commands.`);
-    }
-
-    let afkCheckDuration = parseDuration(args.afkCheckDuration);
-
-    if (afkCheckDuration < 15000 || afkCheckDuration > 900000) {
-      return sendmessage(message.channel, 'Error: `afkCheckDuration` must be between 15 sec and 15 min');
-    }
-
     let ds = this.client.dataSource;
-    let server = ds.servers[message.guild.id];
-
-    if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
-    }
-
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
+    
+    let channelMonitor = args.monitorChannel;
 
     if (!channelMonitor.initialised) {
       await channelMonitor.init();
     }
 
-    channelMonitor.afkCheckDuration = afkCheckDuration;
+    channelMonitor.afkCheckDuration = args.afkCheckDuration;
     ds.saveMonitor(channelMonitor.id);
 
-    return sendmessage(message.channel, `Successfully changed AFK check duration for ${channelMonitor.name} to ${prettyMS(afkCheckDuration)}!`);
+    return sendmessage(message.channel, `Successfully changed AFK check duration for ${channelMonitor.name} to ${prettyMS(args.afkCheckDuration)}!`);
   }
 }
 

@@ -1,6 +1,7 @@
-const { Command } = require('discord-akairo');
+const { Command, Flag } = require('discord-akairo');
 const mps_admin = require('../util/mps_admin');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
 
 class SetPrefixCommand extends Command {
   constructor() {
@@ -12,7 +13,11 @@ class SetPrefixCommand extends Command {
       args: [
         {
           id: 'prefix',
-          type: 'string'
+          type: (message, phrase) => {
+            if (!phrase) return Flag.fail({ reason: 'missingArg' });
+            return phrase;
+          },
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'prefix', failure)
         }
       ]
     });
@@ -21,10 +26,6 @@ class SetPrefixCommand extends Command {
   async exec(message, args) {
     let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
-
-    if (!args.prefix) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`prefix\`. Use fcfs!help for commands.`);
-    }
     
     server.prefix = args.prefix;
     

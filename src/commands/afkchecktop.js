@@ -1,6 +1,7 @@
 const { Command } = require('discord-akairo');
 const mps_mod = require('../util/mps_mod');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
 const AFKChecker = require('../struct/afk_checker');
 
 class AfkCheckTopCommand extends Command {
@@ -13,25 +14,18 @@ class AfkCheckTopCommand extends Command {
       args: [
         {
           id: 'monitorChannel',
-          type: 'voiceChannel'
+          type: 'monitorChannel',
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'monitorChannel', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.monitorChannel) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`monitorChannel\`. Use fcfs!help for commands.`);
-    }
-
     let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 
-    if (!server.channelMonitors[args.monitorChannel.id]) {
-      return sendmessage(message.channel, `Error: ${args.monitorChannel.name} is not being monitored!`);
-    }
-
-    let channelMonitor = server.channelMonitors[args.monitorChannel.id];
+    let channelMonitor = args.monitorChannel;
 
     if (!channelMonitor.queue.length) {
       return sendmessage(message.channel, `Error: there are no members in queue in ${args.monitorChannel.name}`);

@@ -1,6 +1,6 @@
 {
   "name": "fcfs",
-  "version": "3.0.4",
+  "version": "3.1.1",
   "description": "A Discord bot that enhances First Come, First Serve in voice channel waiting rooms.",
   "main": "index.js",
   "scripts": {
@@ -9,10 +9,10 @@
   "author": "perilstar",
   "license": "MIT",
   "dependencies": {
-    "discord-akairo": "^8.0.0",
+    "discord-akairo": "perilstar/discord-akairo#perilstar-union-product-fix",
     "discord.js": "^12.0.2",
     "parse-duration": "^0.1.2",
-    "pretty-ms": "^6.0.1",
+    "pretty-ms": "^7.0.0",
     "sqlite": "^3.0.6",
     "sqlite3": "^4.1.1"
   }

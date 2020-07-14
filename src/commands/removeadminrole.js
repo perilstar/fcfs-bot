@@ -1,5 +1,6 @@
 const { Command } = require('discord-akairo');
 const sendmessage = require('../util/sendmessage');
+const apf = require('../util/arg_parse_failure');
 
 class RemoveAdminRoleCommand extends Command {
   constructor() {
@@ -11,17 +12,14 @@ class RemoveAdminRoleCommand extends Command {
       args: [
         {
           id: 'role',
-          type: 'role'
+          type: 'roleCustom',
+          otherwise: (msg, { failure }) => apf(this.client, msg, 'role', failure)
         }
       ]
     });
   }
 
   async exec(message, args) {
-    if (!args.role) {
-      return sendmessage(message.channel, `Error: Missing or incorrect argument: \`role\`. Use fcfs!help for commands.`);
-    }
-
     let ds = this.client.dataSource;
     let server = ds.servers[message.guild.id];
 

@@ -22,7 +22,7 @@ async function v1to2(db) {
   let results = await db.all(`SELECT guild_id, mod_roles FROM monitor`);
 
   let individual = results.filter((value, index, self) => {
-    return self.findIndex(el => el.guild_id == value.guild_id) === index;
+    return self.findIndex(el => el.guild_id === value.guild_id) === index;
   });
 
   let values = [];
