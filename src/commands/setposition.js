@@ -1,4 +1,4 @@
-const { Command, Argument } = require('discord-akairo');
+const { Command, Argument, Flag } = require('discord-akairo');
 const sendmessage = require('../util/sendmessage');
 const mps_mod = require('../util/mps_mod');
 const apf = require('../util/arg_parse_failure');
@@ -18,7 +18,12 @@ class SetPositionCommand extends Command {
         },
         {
           id: 'position',
-          type: Argument.compose('required', 'integer'),
+          type: (message, phrase) => {
+            if (!phrase) return Flag.fail({ reason: 'missingArg' });
+            const n = parseFloat(phrase);
+            if (isNaN(n)) return Flag.fail({ reason: 'notANumber', phrase });
+            return n;
+          },
           otherwise: (msg, { failure }) => apf(this.client, msg, 'position', failure)
         }
       ]

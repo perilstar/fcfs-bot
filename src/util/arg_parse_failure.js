@@ -36,6 +36,9 @@ module.exports = (client, message, arg, failure) => {
     case 'memberNotInMonitoredChannel':
       msg = `Error: Member ${failure.value.member.user.tag} is not in a monitored voice channel!`;
       break;
+    case 'notANumber':
+      msg = `Error: ${failure.value.phrase} is not a number!`;
+      break;
     default:
       console.log(`Unknown Error on arg parse: ${message}, ${arg}, ${JSON.stringify(failure)}`);
       msg = 'An unknown internal error ocurred! Please report this to peril#1024.';
