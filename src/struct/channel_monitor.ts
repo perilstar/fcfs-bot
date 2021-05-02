@@ -220,7 +220,7 @@ export default class ChannelMonitor {
       return `${index + 1}. ${member.displayName} (${user.tag})`;
     }).join('\n');
 
-    return `${title}\n\`\`\`\n${top ?? '<EMPTY>'}\n\`\`\``;
+    return `${title}\n\`\`\`\n${top.length ? top : '<EMPTY>'}\n\`\`\``;
   }
 
   public async addUserToQueue(userID: Snowflake) {
