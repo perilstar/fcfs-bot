@@ -1,4 +1,5 @@
 import { DMChannel, TextChannel } from 'discord.js';
+import path from 'path';
 
 import {
   AkairoClient, CommandHandler, InhibitorHandler, ListenerHandler,
@@ -11,6 +12,8 @@ import ArgTypesRegistrar from './util/arg_types_registrar';
 const { version } = require('../package.json');
 
 require('dotenv').config();
+
+const appRoot = require.main!.path;
 
 const TOKEN = process.env.FCFS_BOT_TOKEN;
 
@@ -66,7 +69,7 @@ export default class FCFSClient extends AkairoClient {
     this._dataSource = new DataSource(this);
 
     this._commandHandler = new CommandHandler(this, {
-      directory: './src/commands/',
+      directory: path.join(appRoot, 'commands'),
       prefix: (message): Array<string> | string => {
         if (message.channel instanceof TextChannel) {
           return ['fcfs!', this.dataSource.servers[message.channel.guild.id].prefix];
@@ -83,7 +86,7 @@ export default class FCFSClient extends AkairoClient {
     atr.registerTypes();
 
     this._listenerHandler = new ListenerHandler(this, {
-      directory: './src/listeners/',
+      directory: path.join(appRoot, 'listeners'),
     });
 
     this._inhibitorHandler = new InhibitorHandler(this, {});
