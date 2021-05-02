@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint src --ext .ts",
     "build": "tsc",
-    "start": "ts-node src/index.ts"
+    "start-dev": "ts-node src/index.ts",
+    "start": "node lib/"
   },
   "author": "perilstar",
   "license": "MIT",
