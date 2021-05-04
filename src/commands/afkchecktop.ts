@@ -39,7 +39,7 @@ export default class AfkCheckTopCommand extends Command {
     }
 
     const update = (m: Message, data: AFKCheckData) => {
-      let text = 'Mass AFK-checking...\n\n';
+      let text = `Mass AFK-checking for ${channelMonitor.name}...\n\n`;
       if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
       if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
       if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
@@ -49,7 +49,7 @@ export default class AfkCheckTopCommand extends Command {
     };
 
     const finalize = (m: Message, data: AFKCheckData) => {
-      let text = 'Mass AFK-checking complete!\n\n';
+      let text = `Mass AFK-checking complete for ${channelMonitor.name}!\n\n`;
       if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
       if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
       if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
@@ -58,7 +58,7 @@ export default class AfkCheckTopCommand extends Command {
       m.edit(text).catch((err) => console.log(`Failed to finalize in mass check!\n${err.message}`));
     };
 
-    const resultsMessage = await sendmessage(<TextChannel> message.channel, 'Mass AFK-checking...');
+    const resultsMessage = await sendmessage(<TextChannel> message.channel, `Mass AFK-checking for ${channelMonitor.name}...`);
 
     if (!resultsMessage) {
       console.log('Failure creating results message for afkchecktop command');

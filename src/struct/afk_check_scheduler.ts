@@ -38,7 +38,7 @@ export default class AFKCheckScheduler {
       if (!this.channelMonitor.queue.length) return;
 
       const update = (message: Message, data: AFKCheckData) => {
-        let text = 'Auto AFK-checking...\n\n';
+        let text = `Auto AFK-checking for ${this.channelMonitor.name}...\n\n`;
         // eslint-disable-next-line max-len
         if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
         // eslint-disable-next-line max-len
@@ -50,7 +50,7 @@ export default class AFKCheckScheduler {
       };
 
       const finalize = (message: Message, data: AFKCheckData) => {
-        let text = 'Auto AFK-checking complete!\n\n';
+        let text = `Auto AFK-checking complete for ${this.channelMonitor.name}!\n\n`;
         // eslint-disable-next-line max-len
         if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
         // eslint-disable-next-line max-len
@@ -61,7 +61,7 @@ export default class AFKCheckScheduler {
         message.edit(text).catch((err) => console.log(`Failed to finalize in auto check!\n${err.message}`));
       };
 
-      const resultsMessage = await sendmessage(outputChannel, 'Auto AFK-checking...');
+      const resultsMessage = await sendmessage(outputChannel, `Auto AFK-checking for ${this.channelMonitor.name}...`);
       if (!(resultsMessage instanceof Message)) return;
 
       const top: Array<GuildMember> = this.channelMonitor.queue
