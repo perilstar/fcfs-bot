@@ -55,16 +55,28 @@ export default class ChannelMonitor {
     return this._rejoinWindow;
   }
 
+  public set rejoinWindow(window: number) {
+    this._rejoinWindow = window;
+  }
+
   private _displaySize: number;
 
   public get displaySize(): number {
     return this._displaySize;
   }
 
+  public set displaySize(size: number) {
+    this._displaySize = size;
+  }
+
   private _afkCheckDuration: number;
 
   public get afkCheckDuration(): number {
     return this._afkCheckDuration;
+  }
+
+  public set afkCheckDuration(duration: number) {
+    this._afkCheckDuration = duration;
   }
 
   private _lastAfkChecked: { [snowflake: string]: number; };
