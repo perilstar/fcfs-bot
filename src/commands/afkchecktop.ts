@@ -50,10 +50,30 @@ export default class AfkCheckTopCommand extends Command {
 
     const finalize = (m: Message, data: AFKCheckData) => {
       let text = `Mass AFK-checking complete for ${channelMonitor.name}!\n\n`;
-      if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
-      if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
-      if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
-      if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
+
+      if (data.recentlyChecked) {
+        text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over:\n`;
+        text += data.recentlyCheckedList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+        text += '\n';
+      }
+
+      if (data.notInVC) {
+        text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over:\n`;
+        text += data.notInVCList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+        text += '\n';
+      }
+
+      if (data.notAFK) {
+        text += `${data.notAFK} member(s) reacted to the message in time:\n`;
+        text += data.notAFKList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+        text += '\n';
+      }
+
+      if (data.afk) {
+        text += `${data.afk} member(s) were booted from the queue\n`;
+        text += data.afkList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+        text += '\n';
+      }
 
       m.edit(text).catch((err) => console.log(`Failed to finalize in mass check!\n${err.message}`));
     };

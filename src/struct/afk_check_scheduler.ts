@@ -1,8 +1,8 @@
-import { Message, TextChannel, GuildMember } from 'discord.js';
-import AFKChecker, { AFKCheckData } from './afk_checker';
-import sendmessage from '../util/sendmessage';
-import type ChannelMonitor from './channel_monitor';
+import { GuildMember, Message, TextChannel } from 'discord.js';
 import type FCFSClient from '../fcfsclient';
+import sendmessage from '../util/sendmessage';
+import AFKChecker, { AFKCheckData } from './afk_checker';
+import type ChannelMonitor from './channel_monitor';
 
 export default class AFKCheckScheduler {
   private client: FCFSClient;
@@ -51,12 +51,30 @@ export default class AFKCheckScheduler {
 
       const finalize = (message: Message, data: AFKCheckData) => {
         let text = `Auto AFK-checking complete for ${this.channelMonitor.name}!\n\n`;
-        // eslint-disable-next-line max-len
-        if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
-        // eslint-disable-next-line max-len
-        if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
-        if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
-        if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
+
+        if (data.recentlyChecked) {
+          text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over:\n`;
+          text += data.recentlyCheckedList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+          text += '\n';
+        }
+
+        if (data.notInVC) {
+          text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over:\n`;
+          text += data.notInVCList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+          text += '\n';
+        }
+
+        if (data.notAFK) {
+          text += `${data.notAFK} member(s) reacted to the message in time:\n`;
+          text += data.notAFKList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+          text += '\n';
+        }
+
+        if (data.afk) {
+          text += `${data.afk} member(s) were booted from the queue\n`;
+          text += data.afkList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+          text += '\n';
+        }
 
         message.edit(text).catch((err) => console.log(`Failed to finalize in auto check!\n${err.message}`));
       };

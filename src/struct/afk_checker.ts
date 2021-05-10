@@ -12,6 +12,10 @@ export interface AFKCheckData {
   notInVC: number,
   notAFK: number,
   afk: number,
+  recentlyCheckedList: Array<GuildMember>,
+  notInVCList: Array<GuildMember>,
+  notAFKList: Array<GuildMember>,
+  afkList: Array<GuildMember>,
 }
 
 export default class AFKChecker extends EventEmitter {
@@ -32,6 +36,14 @@ export default class AFKChecker extends EventEmitter {
   private afk: number = 0;
 
   private notInVC: number = 0;
+
+  private recentlyCheckedList: Array<GuildMember> = [];
+
+  private notAFKList: Array<GuildMember> = [];
+
+  private afkList: Array<GuildMember> = [];
+
+  private notInVCList: Array<GuildMember> = [];
 
   // eslint-disable-next-line no-undef
   private emitTimer: NodeJS.Timer | null = null;
@@ -56,6 +68,7 @@ export default class AFKChecker extends EventEmitter {
 
     if ((Date.now() - this.channelMonitor.lastAfkChecked[memberToCheck.id]) < 300000) {
       this.recentlyChecked++;
+      this.recentlyCheckedList.push(memberToCheck);
       this.emitIfSafe();
       return;
     }
@@ -84,7 +97,7 @@ export default class AFKChecker extends EventEmitter {
         .then((collected) => {
           const reaction = collected.first();
           if (!reaction) {
-            memberToCheck.send('I messed up.');
+            memberToCheck.send('I messed up. Please notify peril#1024');
             return;
           }
 
@@ -93,6 +106,7 @@ export default class AFKChecker extends EventEmitter {
               .catch((err) => console.log(`Failed to edit message!\n${err.message}`));
             clearTimeout(halfwayTimer);
             this.notAFK++;
+            this.notAFKList.push(memberToCheck);
             this.emitIfSafe();
             this.channelMonitor.lastAfkChecked[memberToCheck.id] = Date.now();
           }
@@ -101,6 +115,7 @@ export default class AFKChecker extends EventEmitter {
           voiceState.kick().catch((err) => console.error(`Failed to kick user!\n${err.message}`));
           this.channelMonitor.removeUserFromQueue(memberToCheck.id);
           this.afk++;
+          this.afkList.push(memberToCheck);
           this.emitIfSafe();
           msg.reply('You failed to react to the message in time. You have been removed from the queue.')
             .catch((err) => console.log(`Failed to send missed check message!\n${err.message}`));
@@ -119,6 +134,7 @@ export default class AFKChecker extends EventEmitter {
 
     this.recentlyChecked = 0;
     this.notInVC = this.members.length - actuallyInVC.length;
+    this.notInVCList = this.members.filter((member) => !actuallyInVC.includes(member));
     this.notAFK = 0;
     this.afk = 0;
 
@@ -130,6 +146,10 @@ export default class AFKChecker extends EventEmitter {
       notInVC: this.notInVC,
       notAFK: this.notAFK,
       afk: this.afk,
+      recentlyCheckedList: this.recentlyCheckedList,
+      notInVCList: this.notInVCList,
+      notAFKList: this.notAFKList,
+      afkList: this.afkList,
     };
   }
 
@@ -148,6 +168,10 @@ export default class AFKChecker extends EventEmitter {
       notInVC: this.notInVC,
       notAFK: this.notAFK,
       afk: this.afk,
+      recentlyCheckedList: this.recentlyCheckedList,
+      notInVCList: this.notInVCList,
+      notAFKList: this.notAFKList,
+      afkList: this.afkList,
     });
   }
 }
