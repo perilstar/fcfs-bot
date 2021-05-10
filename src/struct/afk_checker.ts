@@ -112,8 +112,7 @@ export default class AFKChecker extends EventEmitter {
           }
         })
         .catch(() => {
-          voiceState.kick().catch((err) => console.error(`Failed to kick user!\n${err.message}`));
-          this.channelMonitor.removeUserFromQueue(memberToCheck.id);
+          this.channelMonitor.pushBackOrKick(memberToCheck);
           this.afk++;
           this.afkList.push(memberToCheck);
           this.emitIfSafe();

@@ -1,5 +1,5 @@
 import { Command, FailureData, Flag } from 'discord-akairo';
-import { Message, TextChannel, User } from 'discord.js';
+import { Message, TextChannel } from 'discord.js';
 import type FCFSClient from '../fcfsclient';
 import apf, { ArgParseFailure } from '../util/arg_parse_failure';
 import mpsMod from '../util/mps_mod';
@@ -47,13 +47,9 @@ export default class SetPositionCommand extends Command {
 
     const position = args.position - 1;
     const index = channelMonitor.queue.findIndex((user) => user.id === args.member.id);
-    channelMonitor.queue.splice(index, 1);
 
-    channelMonitor.queue = (<Array<User>> []).concat(
-      channelMonitor.queue.slice(0, position),
-      args.member.user,
-      channelMonitor.queue.slice(position),
-    );
+    channelMonitor.queue.splice(index, 1);
+    channelMonitor.queue.splice(position, 0, args.member.user);
 
     const newPosition = channelMonitor.queue.findIndex((user) => user.id === args.member.id) + 1;
     channelMonitor.timeoutUpdateDisplay();

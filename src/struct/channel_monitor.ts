@@ -1,7 +1,11 @@
+import type { GuildMember } from 'discord.js';
 import {
-  Snowflake, VoiceChannel, TextChannel, User, Util,
+  Snowflake,
+  TextChannel,
+  User,
+  Util,
+  VoiceChannel,
 } from 'discord.js';
-
 import type FCFSClient from '../fcfsclient';
 import AFKCheckScheduler from './afk_check_scheduler';
 
@@ -142,6 +146,8 @@ export default class ChannelMonitor {
 
   // eslint-disable-next-line no-undef
   private updateTimer: NodeJS.Timeout | null = null;
+
+  private alreadyPushedBack: Array<Snowflake> = [];
 
   constructor(client: FCFSClient, data: ChannelMonitorData) {
     this._client = client;
@@ -285,6 +291,19 @@ export default class ChannelMonitor {
       });
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  public pushBackOrKick(member: GuildMember) {
+    if (!this.alreadyPushedBack.includes(member.id)) {
+      const removeIndex = this.queue.findIndex((el) => el.id === member.id);
+      if (removeIndex === -1) return;
+      const [removedUser] = this.queue.splice(removeIndex, 1);
+      this.queue.splice(removeIndex + 20, 0, removedUser);
+    } else {
+      const voiceState = member.voice;
+      voiceState.kick().catch((err) => console.error(`Failed to kick user!\n${err.message}`));
+      this.removeUserFromQueue(member.id);
     }
   }
 }
