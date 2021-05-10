@@ -122,22 +122,25 @@ export default class AFKChecker extends EventEmitter {
           if (action === 'pushedBack') {
             this.pushedBack++;
             this.pushedBackList.push(memberToCheck);
+            // eslint-disable-next-line max-len
+            msg.reply('You failed to react to the message in time. You have been pushed back in the queue. Next missed check will result in a removal.')
+              .catch((err) => console.log(`Failed to send missed check message!\n${err.message}`));
           } else if (action === 'kicked') {
             this.kicked++;
             this.kickedList.push(memberToCheck);
+            msg.reply('You failed to react to the message in time. You have been removed from the queue.')
+              .catch((err) => console.log(`Failed to send missed check message!\n${err.message}`));
           } else {
             console.log('Tried to kick or push back but an error occurred!');
           }
 
           this.emitIfSafe();
-          msg.reply('You failed to react to the message in time. You have been removed from the queue.')
-            .catch((err) => console.log(`Failed to send missed check message!\n${err.message}`));
         });
     }).catch((err) => {
       if (err.code === 50007) {
         voiceState.kick();
       }
-      console.log(`Failed to send AFK check message to user ${memberToCheck.id}!\n${err.message}`);
+      console.log(`Failed to send AFK check message  touser ${memberToCheck.id}!\n${err.message}`);
     });
   }
 
