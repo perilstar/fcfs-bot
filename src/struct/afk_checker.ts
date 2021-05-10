@@ -11,11 +11,13 @@ export interface AFKCheckData {
   recentlyChecked: number,
   notInVC: number,
   notAFK: number,
-  afk: number,
+  pushedBack: number,
+  kicked: number,
   recentlyCheckedList: Array<GuildMember>,
   notInVCList: Array<GuildMember>,
   notAFKList: Array<GuildMember>,
-  afkList: Array<GuildMember>,
+  pushedBackList: Array<GuildMember>,
+  kickedList: Array<GuildMember>,
 }
 
 export default class AFKChecker extends EventEmitter {
@@ -33,7 +35,9 @@ export default class AFKChecker extends EventEmitter {
 
   private notAFK: number = 0;
 
-  private afk: number = 0;
+  private pushedBack: number = 0;
+
+  private kicked: number = 0;
 
   private notInVC: number = 0;
 
@@ -41,7 +45,9 @@ export default class AFKChecker extends EventEmitter {
 
   private notAFKList: Array<GuildMember> = [];
 
-  private afkList: Array<GuildMember> = [];
+  private pushedBackList: Array<GuildMember> = [];
+
+  private kickedList: Array<GuildMember> = [];
 
   private notInVCList: Array<GuildMember> = [];
 
@@ -112,9 +118,17 @@ export default class AFKChecker extends EventEmitter {
           }
         })
         .catch(() => {
-          this.channelMonitor.pushBackOrKick(memberToCheck);
-          this.afk++;
-          this.afkList.push(memberToCheck);
+          const action = this.channelMonitor.pushBackOrKick(memberToCheck);
+          if (action === 'pushedBack') {
+            this.pushedBack++;
+            this.pushedBackList.push(memberToCheck);
+          } else if (action === 'kicked') {
+            this.kicked++;
+            this.kickedList.push(memberToCheck);
+          } else {
+            console.log('Tried to kick or push back but an error occurred!');
+          }
+
           this.emitIfSafe();
           msg.reply('You failed to react to the message in time. You have been removed from the queue.')
             .catch((err) => console.log(`Failed to send missed check message!\n${err.message}`));
@@ -135,7 +149,8 @@ export default class AFKChecker extends EventEmitter {
     this.notInVC = this.members.length - actuallyInVC.length;
     this.notInVCList = this.members.filter((member) => !actuallyInVC.includes(member));
     this.notAFK = 0;
-    this.afk = 0;
+    this.pushedBack = 0;
+    this.kicked = 0;
 
     const promises = actuallyInVC.map((member) => this.runSingle(member));
     await Promise.all(promises);
@@ -144,11 +159,13 @@ export default class AFKChecker extends EventEmitter {
       recentlyChecked: this.recentlyChecked,
       notInVC: this.notInVC,
       notAFK: this.notAFK,
-      afk: this.afk,
+      pushedBack: this.pushedBack,
+      kicked: this.kicked,
       recentlyCheckedList: this.recentlyCheckedList,
       notInVCList: this.notInVCList,
       notAFKList: this.notAFKList,
-      afkList: this.afkList,
+      pushedBackList: this.pushedBackList,
+      kickedList: this.kickedList,
     };
   }
 
@@ -166,11 +183,13 @@ export default class AFKChecker extends EventEmitter {
       recentlyChecked: this.recentlyChecked,
       notInVC: this.notInVC,
       notAFK: this.notAFK,
-      afk: this.afk,
+      pushedBack: this.pushedBack,
+      kicked: this.kicked,
       recentlyCheckedList: this.recentlyCheckedList,
       notInVCList: this.notInVCList,
       notAFKList: this.notAFKList,
-      afkList: this.afkList,
+      pushedBackList: this.pushedBackList,
+      kickedList: this.kickedList,
     });
   }
 }

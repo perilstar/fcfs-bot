@@ -47,9 +47,12 @@ export default class AfkCheckCommand extends Command {
     if (results.recentlyChecked > 0) {
       resultsMessage.edit('That user was recently AFK-Checked. Try again later.')
         .catch((err: Error) => console.log(`Failed to skip manual check!\n${err.message}`));
-    } else if (results.afk > 0) {
+    } else if (results.pushedBack > 0) {
+      resultsMessage.edit('User is AFK. Pushing them back 20 spots.')
+        .catch((err: Error) => console.log(`Failed to update pushedBack in manual check!\n${err.message}`));
+    } else if (results.kicked > 0) {
       resultsMessage.edit('User is AFK. Removing them from the queue.')
-        .catch((err: Error) => console.log(`Failed to update afk in manual check!\n${err.message}`));
+        .catch((err: Error) => console.log(`Failed to update kicked in manual check!\n${err.message}`));
     } else if (results.notAFK > 0) {
       resultsMessage.edit('User is not AFK. Keeping them in the queue.')
         .catch((err: Error) => console.log(`Failed to update not afk in manual check!\n${err.message}`));

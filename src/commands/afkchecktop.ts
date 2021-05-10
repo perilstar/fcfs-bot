@@ -43,7 +43,8 @@ export default class AfkCheckTopCommand extends Command {
       if (data.recentlyChecked) text += `${data.recentlyChecked} member(s) were recently afk-checked and were skipped over\n`;
       if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
       if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
-      if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
+      if (data.pushedBack) text += `${data.pushedBack} member(s) were pushed back 20 spots\n`;
+      if (data.kicked) text += `${data.kicked} member(s) were booted from the queue\n`;
 
       m.edit(text).catch((err) => console.log(`Failed to update in mass check!\n${err.message}`));
     };
@@ -69,10 +70,15 @@ export default class AfkCheckTopCommand extends Command {
         text += '\n';
       }
 
-      if (data.afk) {
-        text += `${data.afk} member(s) were booted from the queue\n`;
-        text += data.afkList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+      if (data.pushedBack) {
+        text += `${data.pushedBack} member(s) were pushed back 20 spots:\n`;
+        text += data.pushedBackList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
         text += '\n';
+      }
+
+      if (data.kicked) {
+        text += `${data.kicked} member(s) were booted from the queue:\n`;
+        text += data.kickedList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
       }
 
       m.edit(text).catch((err) => console.log(`Failed to finalize in mass check!\n${err.message}`));

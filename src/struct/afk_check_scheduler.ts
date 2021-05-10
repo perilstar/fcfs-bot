@@ -44,7 +44,8 @@ export default class AFKCheckScheduler {
         // eslint-disable-next-line max-len
         if (data.notInVC) text += `${data.notInVC} member(s) were not actually in the voice channel and were skipped over\n`;
         if (data.notAFK) text += `${data.notAFK} member(s) reacted to the message in time\n`;
-        if (data.afk) text += `${data.afk} member(s) were booted from the queue\n`;
+        if (data.pushedBack) text += `${data.pushedBack} member(s) were pushed back 20 spots\n`;
+        if (data.kicked) text += `${data.kicked} member(s) were booted from the queue\n`;
 
         message.edit(text).catch((err) => console.log(`Failed to update in auto check!\n${err.message}`));
       };
@@ -70,10 +71,15 @@ export default class AFKCheckScheduler {
           text += '\n';
         }
 
-        if (data.afk) {
-          text += `${data.afk} member(s) were booted from the queue\n`;
-          text += data.afkList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
+        if (data.pushedBack) {
+          text += `${data.pushedBack} member(s) were pushed back 20 spots:\n`;
+          text += data.pushedBackList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
           text += '\n';
+        }
+
+        if (data.kicked) {
+          text += `${data.kicked} member(s) were booted from the queue:\n`;
+          text += data.kickedList.map((member) => `${member.displayName} (${member.user.tag})`).join('\n');
         }
 
         message.edit(text).catch((err) => console.log(`Failed to finalize in auto check!\n${err.message}`));

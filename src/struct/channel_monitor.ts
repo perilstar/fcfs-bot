@@ -297,13 +297,15 @@ export default class ChannelMonitor {
   public pushBackOrKick(member: GuildMember) {
     if (!this.alreadyPushedBack.includes(member.id)) {
       const removeIndex = this.queue.findIndex((el) => el.id === member.id);
-      if (removeIndex === -1) return;
+      if (removeIndex === -1) return 'error';
       const [removedUser] = this.queue.splice(removeIndex, 1);
       this.queue.splice(removeIndex + 20, 0, removedUser);
-    } else {
-      const voiceState = member.voice;
-      voiceState.kick().catch((err) => console.error(`Failed to kick user!\n${err.message}`));
-      this.removeUserFromQueue(member.id);
+      return 'pushedBack';
     }
+
+    const voiceState = member.voice;
+    voiceState.kick().catch((err) => console.error(`Failed to kick user!\n${err.message}`));
+    this.removeUserFromQueue(member.id);
+    return 'kicked';
   }
 }
