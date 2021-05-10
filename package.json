@@ -1,6 +1,6 @@
 {
   "name": "fcfs",
-  "version": "4.2.1",
+  "version": "4.3.0",
   "description": "A Discord bot that enhances First Come, First Serve in voice channel waiting rooms.",
   "main": "index.js",
   "scripts": {
