@@ -86,7 +86,7 @@ export default {
       \`createwaitingroom "<monitorChannel>" <displayCount> <rejoinWindow> <afkCheckDuration>\`
       Creates a waiting room that displays the first displayCount members to join monitorChannel in the channel the command
       was typed in, with a grace period of rejoinWindow for accidental disconnects, and waiting afkCheckDuration to remove
-      the user from queue when they're afk-checked.
+      the user from queue when they're afk-checked. The first missed check will not kick, but instead push back 20 spots.
       *Aliases:* \`cwr\`
       *Example:* \`fcfs!cwr "Waiting Room 1" 10 1m 5m\`
 
