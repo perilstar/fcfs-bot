@@ -270,6 +270,8 @@ export default class ChannelMonitor {
     this.queue.splice(removeIndex, 1);
     this.timeoutUpdateDisplay();
     this.client.dataSource.saveMonitor(this.id);
+    const index = this.alreadyPushedBack.indexOf(userID);
+    this.alreadyPushedBack.splice(index, 1);
     delete this.removalTimers[userID];
   }
 
@@ -300,6 +302,9 @@ export default class ChannelMonitor {
       if (removeIndex === -1) return 'error';
       const [removedUser] = this.queue.splice(removeIndex, 1);
       this.queue.splice(removeIndex + 20, 0, removedUser);
+      this.alreadyPushedBack.push(member.id);
+      this.timeoutUpdateDisplay();
+      this.client.dataSource.saveMonitor(this.id);
       return 'pushedBack';
     }
 
