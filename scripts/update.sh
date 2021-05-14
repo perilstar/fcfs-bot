@@ -6,6 +6,7 @@ pm2 stop fcfs-bot
 
 cd /root/fcfs-bot
 echo "Updating Code..."
+git reset --hard!
 git pull
 rm -rf scripts
 echo "Updating dependencies..."
