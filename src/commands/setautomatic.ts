@@ -88,7 +88,6 @@ export default class SetDisplaySizeCommand extends Command {
     const { outputChannel } = args;
 
     const nextCheck = channelMonitor.afkCheckScheduler.changeInterval(args.interval === 'off' ? -1 : args.interval);
-    if (nextCheck === -1) return;
     channelMonitor.autoOutput = outputChannel ? outputChannel.id : '';
     ds.saveMonitor(channelMonitor.id);
 

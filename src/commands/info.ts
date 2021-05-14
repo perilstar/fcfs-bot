@@ -36,6 +36,18 @@ export default class InfoCommand extends Command {
       `AFK Check Duration: ${prettyMS(channelMonitor.afkCheckDuration)}`,
     ];
 
+    if (channelMonitor.afkCheckScheduler.interval !== -1) {
+      const autoOutputChannel = message.guild!.channels.resolve(channelMonitor.autoOutput);
+
+      if (autoOutputChannel) {
+        lines.push(`Auto Checking every ${prettyMS(channelMonitor.afkCheckScheduler.interval)}`);
+        lines.push(`Auto output directed to ${autoOutputChannel.name}`);
+      } else {
+        lines.push('Something went wrong checking auto AFK check output.');
+        lines.push('Check your server configuration or re-set the automatic property with fcfs!setautomatic');
+      }
+    }
+
     sendmessage(<TextChannel> message.channel, `**Waiting Room Info**\n\`\`\`\n${lines.join('\n')}\n\`\`\``);
   }
 }

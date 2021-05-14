@@ -54,7 +54,7 @@ export default class ListWaitingRoomsCommand extends Command {
     if (page > pages || page < 1) {
       currentPage = ['<NONE>'];
     } else {
-      currentPage = lines.slice((page - 1) * 10, 10);
+      currentPage = lines.slice((page - 1) * 10, page * 10);
     }
 
     const text = `\`\`\`\n${currentPage.join('\n')}\n\nPage ${page}/${pages}\`\`\``;
