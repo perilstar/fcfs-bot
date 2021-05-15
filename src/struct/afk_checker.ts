@@ -131,7 +131,7 @@ export default class AFKChecker extends EventEmitter {
             msg.reply('You failed to react to the message in time. You have been removed from the queue.')
               .catch((err) => console.log(`Failed to send missed check message!\n${err.message}`));
           } else {
-            console.log('Tried to kick or push back but an error occurred!');
+            console.log(`Tried to kick or push back ${memberToCheck.id} but an error occurred!`);
           }
 
           this.emitIfSafe();
